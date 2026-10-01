@@ -1,0 +1,119 @@
+/* ==========================================================================
+   代码高亮 —— Hexo 内置 Prism 的 Monokai 配色
+   （原来 Jekyll 用的是 Rouge + syntax.css，搬到 Hexo 后换成 Prism 的 token 类名）
+   ========================================================================== */
+
+.post_body pre[class*="language-"],
+.post_body pre {
+  background-color: #272822;
+  color: #f8f8f2;
+}
+
+.post_body code[class*="language-"],
+.post_body pre code {
+  color: #f8f8f2;
+  text-shadow: none;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #75715e;
+}
+
+.token.punctuation {
+  color: #f8f8f2;
+}
+
+.token.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #f92672;
+}
+
+.token.boolean,
+.token.number {
+  color: #ae81ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #e6db74;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #f92672;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #66d9ef;
+}
+
+.token.function,
+.token.class-name {
+  color: #a6e22e;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+  font-weight: 700;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+/* Hexo 开行号时会套一层表格，这里让它和主题的圆角/内边距对齐 */
+.post_body figure.highlight {
+  margin: 1.6rem 0;
+  padding: 0;
+  border-radius: var(--radius);
+  background-color: #272822;
+}
+
+.post_body figure.highlight table {
+  margin: 0;
+  border: 0;
+}
+
+.post_body figure.highlight td {
+  border: 0;
+  padding: 0;
+}
+
+.post_body figure.highlight .gutter {
+  color: #75715e;
+  user-select: none;
+}
+
+.post_body figure.highlight pre {
+  margin: 0;
+  border-radius: 0;
+}

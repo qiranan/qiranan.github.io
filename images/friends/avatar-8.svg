@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="一个人的红队 头像占位图">
+  <defs>
+    <linearGradient id="a7" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="hsl(232 62% 46%)"/>
+      <stop offset="1" stop-color="hsl(232 52% 28%)"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" fill="url(#a7)"/>
+  <circle cx="64" cy="64" r="50" fill="none" stroke="hsl(232 70% 88%)" stroke-opacity=".35" stroke-width="1.5"/>
+  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central"
+        font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif"
+        font-size="54" font-weight="700" fill="hsl(232 25% 96%)">红</text>
+</svg>

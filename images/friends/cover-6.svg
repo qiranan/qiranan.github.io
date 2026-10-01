@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="260" viewBox="0 0 640 260" role="img" aria-label="密码学笔记 封面占位图">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="hsl(42 42% 26%)"/>
+      <stop offset="1" stop-color="hsl(42 38% 15%)"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="260" fill="url(#g)"/>
+  <g><path d="M360 260 l 26 -46 l 26 46 z" fill="none" stroke="hsl(42 70% 78%)" stroke-opacity=".2" stroke-width="1.2"/><path d="M390 260 l 26 -46 l 26 46 z" fill="none" stroke="hsl(42 70% 78%)" stroke-opacity=".2" stroke-width="1.2"/><path d="M420 260 l 26 -46 l 26 46 z" fill="none" stroke="hsl(42 70% 78%)" stroke-opacity=".2" stroke-width="1.2"/><path d="M450 260 l 26 -46 l 26 46 z" fill="none" stroke="hsl(42 70% 78%)" stroke-opacity=".2" stroke-width="1.2"/><path d="M480 260 l 26 -46 l 26 46 z" fill="none" stroke="hsl(42 70% 78%)" stroke-opacity=".2" stroke-width="1.2"/><path d="M510 260 l 26 -46 l 26 46 z" fill="none" stroke="hsl(42 70% 78%)" stroke-opacity=".2" stroke-width="1.2"/><path d="M540 260 l 26 -46 l 26 46 z" fill="none" stroke="hsl(42 70% 78%)" stroke-opacity=".2" stroke-width="1.2"/><path d="M570 260 l 26 -46 l 26 46 z" fill="none" stroke="hsl(42 70% 78%)" stroke-opacity=".2" stroke-width="1.2"/><path d="M600 260 l 26 -46 l 26 46 z" fill="none" stroke="hsl(42 70% 78%)" stroke-opacity=".2" stroke-width="1.2"/><path d="M630 260 l 26 -46 l 26 46 z" fill="none" stroke="hsl(42 70% 78%)" stroke-opacity=".2" stroke-width="1.2"/></g>
+  <path d="M0 257 h640" stroke="hsl(42 70% 62%)" stroke-opacity=".55" stroke-width="3"/>
+  <text x="34" y="150" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif"
+        font-size="42" font-weight="700" fill="hsl(42 30% 94%)" fill-opacity=".92">密码学笔记</text>
+  <text x="36" y="186" font-family="ui-monospace, Menlo, Consolas, monospace"
+        font-size="17" letter-spacing="3" fill="hsl(42 55% 82%)" fill-opacity=".75">FRIEND LINK · 06</text>
+</svg>

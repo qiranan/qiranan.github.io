@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="260" viewBox="0 0 640 260" role="img" aria-label="猫猫的安全小屋 封面占位图">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="hsl(88 42% 26%)"/>
+      <stop offset="1" stop-color="hsl(88 38% 15%)"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="260" fill="url(#g)"/>
+  <g><circle cx="510" cy="60" r="28" fill="none" stroke="hsl(88 70% 78%)" stroke-opacity=".28" stroke-width="1.2"/><circle cx="510" cy="60" r="54" fill="none" stroke="hsl(88 70% 78%)" stroke-opacity=".28" stroke-width="1.2"/><circle cx="510" cy="60" r="80" fill="none" stroke="hsl(88 70% 78%)" stroke-opacity=".28" stroke-width="1.2"/><circle cx="510" cy="60" r="106" fill="none" stroke="hsl(88 70% 78%)" stroke-opacity=".28" stroke-width="1.2"/><circle cx="510" cy="60" r="132" fill="none" stroke="hsl(88 70% 78%)" stroke-opacity=".28" stroke-width="1.2"/><circle cx="510" cy="60" r="158" fill="none" stroke="hsl(88 70% 78%)" stroke-opacity=".28" stroke-width="1.2"/></g>
+  <path d="M0 257 h640" stroke="hsl(88 70% 62%)" stroke-opacity=".55" stroke-width="3"/>
+  <text x="34" y="150" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif"
+        font-size="42" font-weight="700" fill="hsl(88 30% 94%)" fill-opacity=".92">猫猫的安全小屋</text>
+  <text x="36" y="186" font-family="ui-monospace, Menlo, Consolas, monospace"
+        font-size="17" letter-spacing="3" fill="hsl(88 55% 82%)" fill-opacity=".75">FRIEND LINK · 01</text>
+</svg>

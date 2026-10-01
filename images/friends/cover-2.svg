@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="260" viewBox="0 0 640 260" role="img" aria-label="深夜代码铺 封面占位图">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="hsl(200 42% 26%)"/>
+      <stop offset="1" stop-color="hsl(200 38% 15%)"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="260" fill="url(#g)"/>
+  <g><line x1="-120" y1="260" x2="40" y2="0" stroke="hsl(200 70% 78%)" stroke-opacity=".22" stroke-width="1.2"/><line x1="-74" y1="260" x2="86" y2="0" stroke="hsl(200 70% 78%)" stroke-opacity=".22" stroke-width="1.2"/><line x1="-28" y1="260" x2="132" y2="0" stroke="hsl(200 70% 78%)" stroke-opacity=".22" stroke-width="1.2"/><line x1="18" y1="260" x2="178" y2="0" stroke="hsl(200 70% 78%)" stroke-opacity=".22" stroke-width="1.2"/><line x1="64" y1="260" x2="224" y2="0" stroke="hsl(200 70% 78%)" stroke-opacity=".22" stroke-width="1.2"/><line x1="110" y1="260" x2="270" y2="0" stroke="hsl(200 70% 78%)" stroke-opacity=".22" stroke-width="1.2"/><line x1="156" y1="260" x2="316" y2="0" stroke="hsl(200 70% 78%)" stroke-opacity=".22" stroke-width="1.2"/><line x1="202" y1="260" x2="362" y2="0" stroke="hsl(200 70% 78%)" stroke-opacity=".22" stroke-width="1.2"/><line x1="248" y1="260" x2="408" y2="0" stroke="hsl(200 70% 78%)" stroke-opacity=".22" stroke-width="1.2"/><line x1="294" y1="260" x2="454" y2="0" stroke="hsl(200 70% 78%)" stroke-opacity=".22" stroke-width="1.2"/><line x1="340" y1="260" x2="500" y2="0" stroke="hsl(200 70% 78%)" stroke-opacity=".22" stroke-width="1.2"/><line x1="386" y1="260" x2="546" y2="0" stroke="hsl(200 70% 78%)" stroke-opacity=".22" stroke-width="1.2"/><line x1="432" y1="260" x2="592" y2="0" stroke="hsl(200 70% 78%)" stroke-opacity=".22" stroke-width="1.2"/><line x1="478" y1="260" x2="638" y2="0" stroke="hsl(200 70% 78%)" stroke-opacity=".22" stroke-width="1.2"/></g>
+  <path d="M0 257 h640" stroke="hsl(200 70% 62%)" stroke-opacity=".55" stroke-width="3"/>
+  <text x="34" y="150" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif"
+        font-size="42" font-weight="700" fill="hsl(200 30% 94%)" fill-opacity=".92">深夜代码铺</text>
+  <text x="36" y="186" font-family="ui-monospace, Menlo, Consolas, monospace"
+        font-size="17" letter-spacing="3" fill="hsl(200 55% 82%)" fill-opacity=".75">FRIEND LINK · 02</text>
+</svg>
