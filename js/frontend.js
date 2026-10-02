@@ -605,7 +605,10 @@
       ctx.fillStyle = theme.bg2;
       ctx.fill();
       ctx.clip();
-      if (img.avatar) ctx.drawImage(img.avatar, ax, ay, av, av);
+      /* 用 drawCover 而不是直接 drawImage(…, av, av)：
+         后者会把图片硬拉成正方形，非方形的头像（比如 3:1 的长图）会被压扁变形。
+         drawCover 是居中裁切，和封面的处理一致。 */
+      if (img.avatar) drawCover(img.avatar, ax, ay, av, av);
       ctx.restore();
 
       /* 名字 */
