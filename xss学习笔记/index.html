@@ -198,7 +198,8 @@
 
     <main class="page" id="page">
       
-<article class="post wrap">
+<div class="post_layout wrap">
+<article class="post">
   <header class="post_head">
     <p class="post_head_date reveal"><span>2026.03.01</span></p>
     <h1 class="post_head_title" data-split-lines>xss学习笔记</h1>
@@ -207,7 +208,7 @@
     
   </header>
 
-  <div class="post_body" data-reveal-body>
+  <div class="post_body" id="post-content" data-reveal-body>
     <p>csp通常会出现在xss相关题目中，对csp绕过的学习也应该提上日程了</p>
 <h2 id="1-iframe绕过"><a href="#1-iframe绕过" class="headerlink" title="1.iframe绕过"></a>1.iframe绕过</h2><p>当一个同源站点，同时存在两个页面，其中一个有CSP保护的A页面，另一个没有CSP保护B页面，那么如果B页面存在XSS漏洞，我们可以直接在B页面新建iframe用javascript直接操作A页面的dom，可以说A页面的CSP防护完全失效</p>
 <p>A页面:</p>
@@ -287,6 +288,27 @@ setTimeout(()&#x3D;&gt;alert(iframe.contentWindow.document.getElementById(&#39;f
     </a>
   </p>
 </article>
+<aside class="post_toc">
+  
+<details class="rail_toc" data-rail-toc open>
+  <summary class="rail_toc_title">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+      <path d="M2 4h12M2 8h8M2 12h10" />
+    </svg>
+    <span>文章目录</span>
+    <svg class="rail_toc_chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <path d="m4 6 4 4 4-4" />
+    </svg>
+  </summary>
+  <nav class="rail_toc_scroll" aria-label="文章目录" data-lenis-prevent tabindex="0">
+    
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-iframe%E7%BB%95%E8%BF%87"><span class="toc-text">1.iframe绕过</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-CDN%E7%BB%95%E8%BF%87"><span class="toc-text">2.CDN绕过</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E7%AB%99%E7%82%B9%E5%8F%AF%E6%8E%A7%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E7%BB%95%E8%BF%87"><span class="toc-text">3.站点可控静态资源绕过</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E7%AB%99%E7%82%B9%E5%8F%AF%E6%8E%A7JSONP%E7%BB%95%E8%BF%87"><span class="toc-text">4.站点可控JSONP绕过</span></a></li></ol>
+    
+  </nav>
+</details>
+
+</aside>
+</div>
 
     </main>
 
@@ -310,6 +332,7 @@ setTimeout(()&#x3D;&gt;alert(iframe.contentWindow.document.getElementById(&#39;f
     <script src="/js/vendor/CustomEase.min.js"></script>
     <script src="/js/vendor/SplitText.min.js"></script>
     <script src="/js/vendor/lenis.min.js"></script>
+    <script src="/js/rail-toc.js"></script>
     <script src="/js/frontend.js"></script>
   </body>
 </html>

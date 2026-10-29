@@ -198,7 +198,8 @@
 
     <main class="page" id="page">
       
-<article class="post wrap">
+<div class="post_layout wrap">
+<article class="post">
   <header class="post_head">
     <p class="post_head_date reveal"><span>2026.04.25</span></p>
     <h1 class="post_head_title" data-split-lines>codegate2026</h1>
@@ -207,7 +208,7 @@
     
   </header>
 
-  <div class="post_body" data-reveal-body>
+  <div class="post_body" id="post-content" data-reveal-body>
     <h2 id="1-ERP-system"><a href="#1-ERP-system" class="headerlink" title="1.ERP system"></a>1.ERP system</h2><p><code>init.sql</code>中为低权限用户，<code>hash.php</code>中</p>
 
   </div>
@@ -235,6 +236,27 @@
     </a>
   </p>
 </article>
+<aside class="post_toc">
+  
+<details class="rail_toc" data-rail-toc open>
+  <summary class="rail_toc_title">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+      <path d="M2 4h12M2 8h8M2 12h10" />
+    </svg>
+    <span>文章目录</span>
+    <svg class="rail_toc_chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <path d="m4 6 4 4 4-4" />
+    </svg>
+  </summary>
+  <nav class="rail_toc_scroll" aria-label="文章目录" data-lenis-prevent tabindex="0">
+    
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-ERP-system"><span class="toc-text">1.ERP system</span></a></li></ol>
+    
+  </nav>
+</details>
+
+</aside>
+</div>
 
     </main>
 
@@ -258,6 +280,7 @@
     <script src="/js/vendor/CustomEase.min.js"></script>
     <script src="/js/vendor/SplitText.min.js"></script>
     <script src="/js/vendor/lenis.min.js"></script>
+    <script src="/js/rail-toc.js"></script>
     <script src="/js/frontend.js"></script>
   </body>
 </html>

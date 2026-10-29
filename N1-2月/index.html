@@ -198,7 +198,8 @@
 
     <main class="page" id="page">
       
-<article class="post wrap">
+<div class="post_layout wrap">
+<article class="post">
   <header class="post_head">
     <p class="post_head_date reveal"><span>2025.11.12</span></p>
     <h1 class="post_head_title" data-split-lines>N1的2月题</h1>
@@ -207,7 +208,7 @@
     
   </header>
 
-  <div class="post_body" data-reveal-body>
+  <div class="post_body" id="post-content" data-reveal-body>
     <p>看看2月题，一定要全部搞懂。  </p>
 <h2 id="1-Gavatar"><a href="#1-Gavatar" class="headerlink" title="1.Gavatar:"></a>1.Gavatar:</h2><p>看看签到题。  </p>
 <p>刚进入页面的登录没什么可以操作的，不是一个注入。关键在上传头像。  </p>
@@ -447,6 +448,27 @@ app<span class="token punctuation">.</span><span class="token function">use</spa
     </a>
   </p>
 </article>
+<aside class="post_toc">
+  
+<details class="rail_toc" data-rail-toc open>
+  <summary class="rail_toc_title">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+      <path d="M2 4h12M2 8h8M2 12h10" />
+    </svg>
+    <span>文章目录</span>
+    <svg class="rail_toc_chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <path d="m4 6 4 4 4-4" />
+    </svg>
+  </summary>
+  <nav class="rail_toc_scroll" aria-label="文章目录" data-lenis-prevent tabindex="0">
+    
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Gavatar"><span class="toc-text">1.Gavatar:</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-traefik"><span class="toc-text">2.traefik</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-backup"><span class="toc-text">3.backup</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-easyDB"><span class="toc-text">4.easyDB</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-dispaly"><span class="toc-text">5.dispaly</span></a></li></ol>
+    
+  </nav>
+</details>
+
+</aside>
+</div>
 
     </main>
 
@@ -470,6 +492,7 @@ app<span class="token punctuation">.</span><span class="token function">use</spa
     <script src="/js/vendor/CustomEase.min.js"></script>
     <script src="/js/vendor/SplitText.min.js"></script>
     <script src="/js/vendor/lenis.min.js"></script>
+    <script src="/js/rail-toc.js"></script>
     <script src="/js/frontend.js"></script>
   </body>
 </html>

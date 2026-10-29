@@ -21,6 +21,7 @@
   /* GSAP 没加载成功就把内容原样放出来，页面必须还能读 */
   if (!gsap) {
     root.classList.remove('has-splash', 'enter-transition');
+    if (window.initRailToc) window.initRailToc();
     return;
   }
 
@@ -1047,12 +1048,14 @@
   }
 
   function scrollToAnchor(hash) {
-    var target = document.querySelector(hash);
+    var id;
+    try { id = decodeURIComponent(hash.slice(1)); } catch (e) { id = hash.slice(1); }
+    var target = document.getElementById(id);
     if (!target) return;
     if (lenis) {
       lenis.scrollTo(target, { offset: -90 });
     } else {
-      window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - 90, behavior: 'smooth' });
+      window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - 90, behavior: reduce ? 'auto' : 'smooth' });
     }
   }
 
@@ -1108,6 +1111,15 @@
      ====================================================================== */
   function boot() {
     initScroll();
+    if (window.initRailToc) window.initRailToc({
+      scrollTo: function (target, offset) {
+        /* 先解除标题的入场位移，避免跳转落点随后再上移 24px。 */
+        gsap.killTweensOf(target);
+        gsap.set(target, { opacity: 1, y: 0 });
+        if (lenis) lenis.scrollTo(target, { offset: -offset });
+        else window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - offset, behavior: reduce ? 'auto' : 'smooth' });
+      }
+    });
     initNav();
     initLinks();
     initCursor();

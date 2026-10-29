@@ -198,7 +198,8 @@
 
     <main class="page" id="page">
       
-<article class="post wrap">
+<div class="post_layout wrap">
+<article class="post">
   <header class="post_head">
     <p class="post_head_date reveal"><span>2025.12.15</span></p>
     <h1 class="post_head_title" data-split-lines>N1 2025-9</h1>
@@ -207,7 +208,7 @@
     
   </header>
 
-  <div class="post_body" data-reveal-body>
+  <div class="post_body" id="post-content" data-reveal-body>
     <h2 id="1-ping"><a href="#1-ping" class="headerlink" title="1.ping"></a>1.ping</h2><p>小小签到题。</p>
 <p>源码很简单，核心是在对于输入的ip的过滤：</p>
 <pre class="language-python" data-language="python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">run_ping</span><span class="token punctuation">(</span>ip_base64<span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -325,6 +326,27 @@ SESSION_DATA <span class="token operator">=</span> <span class="token punctuatio
     </a>
   </p>
 </article>
+<aside class="post_toc">
+  
+<details class="rail_toc" data-rail-toc open>
+  <summary class="rail_toc_title">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+      <path d="M2 4h12M2 8h8M2 12h10" />
+    </svg>
+    <span>文章目录</span>
+    <svg class="rail_toc_chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <path d="m4 6 4 4 4-4" />
+    </svg>
+  </summary>
+  <nav class="rail_toc_scroll" aria-label="文章目录" data-lenis-prevent tabindex="0">
+    
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-ping"><span class="toc-text">1.ping</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-online-unzipper"><span class="toc-text">2.online_unzipper</span></a></li></ol>
+    
+  </nav>
+</details>
+
+</aside>
+</div>
 
     </main>
 
@@ -348,6 +370,7 @@ SESSION_DATA <span class="token operator">=</span> <span class="token punctuatio
     <script src="/js/vendor/CustomEase.min.js"></script>
     <script src="/js/vendor/SplitText.min.js"></script>
     <script src="/js/vendor/lenis.min.js"></script>
+    <script src="/js/rail-toc.js"></script>
     <script src="/js/frontend.js"></script>
   </body>
 </html>

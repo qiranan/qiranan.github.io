@@ -198,7 +198,8 @@
 
     <main class="page" id="page">
       
-<article class="post wrap">
+<div class="post_layout wrap">
+<article class="post">
   <header class="post_head">
     <p class="post_head_date reveal"><span>2026.04.24</span></p>
     <h1 class="post_head_title" data-split-lines>归来仍是菜鸡</h1>
@@ -207,7 +208,7 @@
     
   </header>
 
-  <div class="post_body" data-reveal-body>
+  <div class="post_body" id="post-content" data-reveal-body>
     <p>好长时间没有写博客了，因为事情比较多（我也不知道在忙什么），也因为在重新学习一些基础知识。奠定基础是一件非常耗费时间的事情，我也重新看了一下之前写的博客，也看出了很多问题。大部分还是当时理解的不够深入，而且相当一部分ai含量很高。所以我会慢慢地重写这些基础，当然是以纯古法的方式。</p>
 <p>而且只有基础是远远不够的，很长一段时间里我苦于不知道如何去运用这些知识，比赛成绩一直很难看（虽然现在也很难看），我也在寻找独属于我的方式进步。作为一个web手，代码审计能力是凌驾于一切之上的。不过在此之外，对于网站架构，语言特性等也需要很了解。我现在能做的只有多看，多练，多想，然后把我所有的经验整理成一份详细的，有迹可循的方法论。</p>
 <p>我也要改进我的博客，加上搜索栏，评论区，标签什么的。之后应该也会有我自己的服务器，这个静态网站也能迁移过去，能做的东西也会更多。</p>
@@ -237,6 +238,27 @@
     </a>
   </p>
 </article>
+<aside class="post_toc">
+  
+<details class="rail_toc" data-rail-toc open>
+  <summary class="rail_toc_title">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+      <path d="M2 4h12M2 8h8M2 12h10" />
+    </svg>
+    <span>文章目录</span>
+    <svg class="rail_toc_chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <path d="m4 6 4 4 4-4" />
+    </svg>
+  </summary>
+  <nav class="rail_toc_scroll" aria-label="文章目录" data-lenis-prevent tabindex="0">
+    
+    <ol class="toc"><li class="toc-item"><a class="toc-link" href="#post-content"><span class="toc-text">正文</span></a></li></ol>
+    
+  </nav>
+</details>
+
+</aside>
+</div>
 
     </main>
 
@@ -260,6 +282,7 @@
     <script src="/js/vendor/CustomEase.min.js"></script>
     <script src="/js/vendor/SplitText.min.js"></script>
     <script src="/js/vendor/lenis.min.js"></script>
+    <script src="/js/rail-toc.js"></script>
     <script src="/js/frontend.js"></script>
   </body>
 </html>
