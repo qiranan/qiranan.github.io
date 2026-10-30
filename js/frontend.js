@@ -22,6 +22,7 @@
   if (!gsap) {
     root.classList.remove('has-splash', 'enter-transition');
     if (window.initRailToc) window.initRailToc();
+    if (window.initScrollProgress) window.initScrollProgress();
     return;
   }
 
@@ -1120,6 +1121,7 @@
         else window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - offset, behavior: reduce ? 'auto' : 'smooth' });
       }
     });
+    if (window.initScrollProgress) window.initScrollProgress();
     initNav();
     initLinks();
     initCursor();

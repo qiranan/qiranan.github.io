@@ -275,6 +275,7 @@
         pinned = index;
         userScrolled = false;
         sync();
+        document.dispatchEvent(new CustomEvent('blog:section-select', { detail: { id: item.target.id } }));
         if (window.location.hash !== item.link.hash) history.pushState(null, '', item.link.hash);
         if (options.scrollTo) options.scrollTo(item.target, offset());
         else window.scrollTo({ top: item.target.getBoundingClientRect().top + window.scrollY - offset(), behavior: motionQuery.matches ? 'auto' : 'smooth' });

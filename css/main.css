@@ -1550,6 +1550,198 @@ kbd {
   }
 }
 
+/* 底部阅读进度胶囊，与右侧目录共用文章章节。 */
+.scroll_progress {
+  position: fixed;
+  z-index: 90;
+  bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: .875rem;
+  line-height: 1.4;
+}
+
+.scroll_progress_surface {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color_glass_line);
+  background: var(--color_glass);
+  box-shadow: 0 8px 32px -10px rgb(0 0 0 / .28);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+}
+
+.scroll_progress.is-ready .scroll_progress_surface {
+  transition: width .5s cubic-bezier(.34, 1.16, .64, 1),
+    height .5s cubic-bezier(.34, 1.16, .64, 1),
+    border-radius .5s cubic-bezier(.34, 1.16, .64, 1),
+    background-color var(--duration_m) ease;
+}
+
+.scroll_progress_toggle {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: .625rem;
+  width: max-content;
+  max-width: min(26rem, calc(100vw - 2rem));
+  min-height: 44px;
+  margin: 0;
+  padding: .6rem 1rem .6rem .65rem;
+  border: 0;
+  border-radius: inherit;
+  color: var(--color_fg);
+  background: none;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.scroll_progress_ring {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.scroll_progress_ring svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.scroll_progress_ring_track {
+  stroke: var(--color_mid);
+}
+
+.scroll_progress_ring_fill {
+  stroke: var(--color_theme);
+}
+
+.scroll_progress_label,
+.scroll_progress_label > span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scroll_progress_label > span {
+  animation: scroll_progress_label .22s cubic-bezier(.22, 1, .36, 1);
+}
+
+@keyframes scroll_progress_label {
+  from { opacity: 0; filter: blur(1.5px); }
+  to { opacity: 1; filter: blur(0); }
+}
+
+.scroll_progress_panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: max-content;
+  max-width: min(32rem, calc(100vw - 2rem));
+  max-height: min(55svh, 28rem);
+  padding: 6px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color_mid) transparent;
+}
+
+.scroll_progress_toggle,
+.scroll_progress_panel {
+  transition: opacity .24s cubic-bezier(.65, 0, .35, 1),
+    filter .24s cubic-bezier(.65, 0, .35, 1);
+}
+
+.scroll_progress_panel,
+.scroll_progress.is-open .scroll_progress_toggle {
+  opacity: 0;
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.scroll_progress.is-open .scroll_progress_panel {
+  opacity: 1;
+  filter: blur(0);
+  pointer-events: auto;
+}
+
+.scroll_progress_list {
+  position: relative;
+}
+
+.scroll_progress_items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scroll_progress_items li {
+  position: relative;
+  margin: 0;
+}
+
+.scroll_progress_link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  min-height: 44px;
+  padding: .65rem .85rem;
+  border-radius: 14px;
+  color: var(--color_dim);
+  font-weight: 500;
+  transition: color var(--duration_xs) ease;
+}
+
+.scroll_progress_link > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.scroll_progress_link:hover,
+.scroll_progress_link[aria-current="location"] {
+  color: var(--color_fg);
+}
+
+.scroll_progress_dot {
+  flex: 0 0 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color_mid);
+  transition: background-color var(--duration_xs) ease;
+}
+
+.scroll_progress_link[aria-current="location"] .scroll_progress_dot {
+  background: var(--color_theme);
+}
+
+.scroll_progress_highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  border-radius: 14px;
+  background: var(--color_glass_line);
+  pointer-events: none;
+  transition: transform .5s cubic-bezier(.34, 1.16, .64, 1), height .5s ease;
+}
+
+.scroll_progress :is(a, button):focus-visible {
+  outline: 2px solid var(--color_theme);
+  outline-offset: -3px;
+}
+
+.has-scroll-progress .site_footer {
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+}
+
 .post_head {
   margin-bottom: 3rem;
   padding-bottom: 1.6rem;

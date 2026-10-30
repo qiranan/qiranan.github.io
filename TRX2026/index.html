@@ -1445,6 +1445,26 @@ NSS=trustOrder=100 cipherOrder=100
 
     </main>
 
+    <div class="scroll_progress" data-scroll-progress data-slot="scroll-progress" hidden>
+  <div class="scroll_progress_surface" data-slot="scroll-progress-surface">
+    <button class="scroll_progress_toggle" type="button" aria-label="展开章节目录" aria-expanded="false" aria-controls="scroll-progress-sections">
+      <span class="scroll_progress_ring" role="progressbar" aria-label="阅读进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle class="scroll_progress_ring_track" cx="12" cy="12" r="10" fill="none" stroke-width="2.5" />
+          <circle class="scroll_progress_ring_fill" cx="12" cy="12" r="10" fill="none" stroke-width="2.5" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" />
+        </svg>
+      </span>
+      <span class="scroll_progress_label"><span data-slot="scroll-progress-label">正文</span></span>
+    </button>
+    <nav class="scroll_progress_panel" id="scroll-progress-sections" aria-label="快捷章节导航" aria-hidden="true" inert data-lenis-prevent>
+      <div class="scroll_progress_list">
+        <span class="scroll_progress_highlight" aria-hidden="true"></span>
+        <ul class="scroll_progress_items"></ul>
+      </div>
+    </nav>
+  </div>
+</div>
+
     <footer class="site_footer">
   <p class="site_footer_copy">
     &copy; 2026 祈染安 &middot; 安的角落
@@ -1465,7 +1485,10 @@ NSS=trustOrder=100 cipherOrder=100
     <script src="/js/vendor/CustomEase.min.js"></script>
     <script src="/js/vendor/SplitText.min.js"></script>
     <script src="/js/vendor/lenis.min.js"></script>
+    
     <script src="/js/rail-toc.js"></script>
+    <script src="/js/scroll-progress.js"></script>
+    
     <script src="/js/frontend.js"></script>
   </body>
 </html>
